@@ -30,8 +30,8 @@ class BaseDatabaseInteractor(BaseModel):
             self.creation_datetime = datetime.utcnow()
         if self.update_datetime is None:
             self.update_datetime = datetime.utcnow()
+        self.save_dir = os.path.join(os.path.dirname(os.getcwd()), 'data')
 
-        self.save_dir = os.path.join(os.path.basename(os.getcwd()), 'data')
 
     def save_file(self, path: str, content: Dict):
         with open(path, 'w') as f:

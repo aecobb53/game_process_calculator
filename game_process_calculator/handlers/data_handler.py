@@ -7,7 +7,6 @@ from tkinter import W
 import requests
 
 from typing import List, Optional, Dict, Union
-from game_process_calculator.models.workflow import Workflow
 
 from handlers import (ProjectHandler,
     ResourceHandler,

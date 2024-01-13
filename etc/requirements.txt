@@ -1,17 +1,11 @@
 # Functionality
 python-dotenv
-tasklib
 requests
-websocket
-websockets
+# websocket
+# websockets
 pyyaml
-google-api-python-client
-geopy
-noaa-sdk
-boto3
 
 # Daemon
-# aiofiles
 uvicorn
 fastapi
 gunicorn
@@ -32,23 +26,14 @@ pytest-pythonpath
 pytest-stub
 
 # Database
-# pymongo
-sqlite3
-sqlalchemy
+# sqlalchemy
 
 # Scraping
-beautifulsoup4
-html5lib
 lxml
-pyperclip
-requests-html
 
-# Machine Learning
-# tensorflow
-
-# Tutorial on Machine Learning
-openpyxl
-pandas
+# # Tutorial on Machine Learning
+# openpyxl
+# pandas
 
 # My libraries
 git+https://github.com/aecobb53/phtml@main

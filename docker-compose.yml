@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+    game_process_calculator:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: game_process_calculator
+        restart: always
+        command: bash etc/entrypoint.sh
+        volumes:
+            - .:/usr/src
+        ports:
+            - 8203:8000
+        environment:
+            - TESTING=1
