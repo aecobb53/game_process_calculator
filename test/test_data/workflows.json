@@ -1,0 +1,50 @@
+[
+    {
+        "id": 0,
+        "uid": "43e88856-e69d-446a-9d04-73f47ceac13e",
+        "creation_datetime": "2024-01-13T06:03:39.476152Z",
+        "update_datetime": "2024-01-13T06:03:39.476154Z",
+        "description": null,
+        "notes": null,
+        "active": true,
+        "deleted": false,
+        "name": "Testing",
+        "project_uid": "5119e254-91db-4b4f-b352-610c72c66e55",
+        "process_uids": [
+            "84e9b868-3d80-46f1-9377-4654caed5657"
+        ],
+        "process_type": "LINEAR"
+    },
+    {
+        "id": 1,
+        "uid": "2f6779ff-4bdd-4a96-9937-3c187da6aec4",
+        "creation_datetime": "2024-01-13T06:03:39.476172Z",
+        "update_datetime": "2024-01-13T06:03:39.476176Z",
+        "description": null,
+        "notes": null,
+        "active": true,
+        "deleted": false,
+        "name": "Renamed",
+        "project_uid": "5119e254-91db-4b4f-b352-610c72c66e55",
+        "process_uids": [
+            "84e9b868-3d80-46f1-9377-4654caed5657"
+        ],
+        "process_type": "PARALLEL"
+    },
+    {
+        "id": 2,
+        "uid": "7c9e3f14-cc12-4054-9d0a-2b858e1aac1b",
+        "creation_datetime": "2024-01-13T06:03:39.476203Z",
+        "update_datetime": "2024-01-13T06:03:39.476206Z",
+        "description": null,
+        "notes": null,
+        "active": false,
+        "deleted": false,
+        "name": "Testing3",
+        "project_uid": "5119e254-91db-4b4f-b352-610c72c66e55",
+        "process_uids": [
+            "84e9b868-3d80-46f1-9377-4654caed5657"
+        ],
+        "process_type": "WEB"
+    }
+]
