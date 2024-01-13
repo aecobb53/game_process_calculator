@@ -3,6 +3,7 @@ import re
 import os
 import requests
 
+from copy import deepcopy
 from typing import List, Optional, Dict, Union
 
 from handlers import BaseDatabaseInteractor
@@ -43,10 +44,11 @@ class WorkflowHandler(BaseDatabaseInteractor):
 
     def create(self, workflow: Workflow) -> Workflow:
         workflows = self.workflows
-        workflow.id = len(workflows)
-        workflows.append(workflow)
+        new_workflow = Workflow.build(workflow.put())
+        new_workflow.id = len(workflows)
+        workflows.append(new_workflow)
         self.save()
-        return workflow
+        return new_workflow
 
     def filter(self, workflow_filter: WorkflowFilter) -> List[Workflow]:
         workflows = self.workflows
@@ -54,9 +56,11 @@ class WorkflowHandler(BaseDatabaseInteractor):
         return workflows
 
     def update(self, workflow: Workflow) -> None:
-        old_process = self.filter(workflow_filter=WorkflowFilter(uid=[workflow.uid]))[0]
-        self.workflows[old_process.id] = workflow
+        updated_workflow = self.filter(workflow_filter=WorkflowFilter(uid=[workflow.uid]))[0]
+        updated_workflow.update(workflow)
+        self.workflows[updated_workflow.id] = updated_workflow
         self.save()
+        return deepcopy(updated_workflow)
 
     def delete(self, workflow: Workflow) -> None:
         workflow.deleted = True

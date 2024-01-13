@@ -82,6 +82,15 @@ class BaseDBObj(BaseModel):
         }
         return content
 
+    def update(self, obj) -> None:
+        self.description = obj.description
+        self.notes = obj.notes
+        self.name = obj.name
+        self.active = obj.active
+        self.deleted = obj.deleted
+
+        self.update_datetime = datetime.utcnow()
+
 
 class BaseDBObjFilter(BaseModel):
     uid: Optional[List[str]] = None

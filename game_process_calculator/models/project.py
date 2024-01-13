@@ -36,6 +36,10 @@ class Project(BaseDBObj):
         })
         return content
 
+    def update(self, project):
+        super().update(project)
+        self.name = project.name
+
 
 class ProjectFilter(BaseDBObjFilter):
     name: Optional[List[str]] = None

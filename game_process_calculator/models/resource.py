@@ -64,6 +64,13 @@ class Resource(BaseDBObj):
         })
         return content
 
+    def update(self, project):
+        super().update(project)
+        self.name = project.name
+        self.acquisition_uids = project.acquisition_uids
+        self.desposal_uids = project.desposal_uids
+        self.value_obj_uid = project.value_obj_uid
+        self.value_amount = project.value_amount
 
 class ResourceFilter(BaseDBObjFilter):
     name: Optional[List[str]] = None

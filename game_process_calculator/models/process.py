@@ -51,6 +51,13 @@ class Process(BaseDBObj):
         })
         return content
 
+    def update(self, project):
+        super().update(project)
+        self.name = project.name
+        self.consume_uids = project.consume_uids
+        self.produce_uids = project.produce_uids
+        self.process_time_seconds = project.process_time_seconds
+        self.rest_time_seconds = project.rest_time_seconds
 
 class ProcessFilter(BaseDBObjFilter):
     name: Optional[List[str]] = None

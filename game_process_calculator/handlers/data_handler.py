@@ -140,16 +140,16 @@ class DataHandler:
 
     # delete
     def delete_project(self, project: Project):
-        pass
+        self.project_handler.delete(project)
 
     def delete_resource(self, resource: Resource):
-        pass
+        self.resource_handler.delete(resource)
 
     def delete_process(self, process: Process):
-        pass
+        self.process_handler.delete(process)
 
     def delete_workflow(self, workflow: Workflow):
-        pass
+        self.workflow_handler.delete(workflow)
 
 
 

@@ -3,6 +3,7 @@ import re
 import os
 import requests
 
+from copy import deepcopy
 from typing import List, Optional, Dict, Union
 
 from handlers import BaseDatabaseInteractor
@@ -43,10 +44,11 @@ class ProcessHandler(BaseDatabaseInteractor):
 
     def create(self, process: Process) -> Process:
         processes = self.processes
-        process.id = len(processes)
-        processes.append(process)
+        new_process = Process.build(process.put())
+        new_process.id = len(processes)
+        processes.append(new_process)
         self.save()
-        return process
+        return new_process
 
     def filter(self, process_filter: ProcessFilter) -> List[Process]:
         processes = self.processes
@@ -54,9 +56,11 @@ class ProcessHandler(BaseDatabaseInteractor):
         return processes
 
     def update(self, process: Process) -> None:
-        old_process = self.filter(process_filter=ProcessFilter(uid=[process.uid]))[0]
-        self.processes[old_process.id] = process
+        updated_process = self.filter(process_filter=ProcessFilter(uid=[process.uid]))[0]
+        updated_process.update(process)
+        self.processes[updated_process.id] = updated_process
         self.save()
+        return deepcopy(process)
 
     def delete(self, process: Process) -> None:
         process.deleted = True

@@ -3,6 +3,7 @@ import re
 import os
 import requests
 
+from copy import deepcopy
 from typing import List, Optional, Dict, Union
 
 from handlers import BaseDatabaseInteractor
@@ -43,10 +44,11 @@ class ProjectHandler(BaseDatabaseInteractor):
 
     def create(self, project: Project) -> Project:
         projects = self.projects
-        project.id = len(projects)
-        projects.append(project)
+        new_project = Project.build(project.put())
+        new_project.id = len(projects)
+        projects.append(new_project)
         self.save()
-        return project
+        return new_project
 
     def filter(self, project_filter: ProjectFilter) -> List[Project]:
         projects = self.projects
@@ -54,9 +56,11 @@ class ProjectHandler(BaseDatabaseInteractor):
         return projects
 
     def update(self, project: Project) -> None:
-        old_project = self.filter(project_filter=ProjectFilter(uid=[project.uid]))[0]
-        self.projects[old_project.id] = project
+        updated_project = self.filter(project_filter=ProjectFilter(uid=[project.uid]))[0]
+        updated_project.update(project)
+        self.projects[updated_project.id] = updated_project
         self.save()
+        return deepcopy(project)
 
     def delete(self, project: Project) -> None:
         project.deleted = True

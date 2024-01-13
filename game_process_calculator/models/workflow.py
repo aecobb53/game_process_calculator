@@ -51,6 +51,11 @@ class Workflow(BaseDBObj):
         })
         return content
 
+    def update(self, project):
+        super().update(project)
+        self.name = project.name
+        self.process_uids = project.process_uids
+        self.process_type = project.process_type
 
 class WorkflowFilter(BaseDBObjFilter):
     name: Optional[List[str]] = None

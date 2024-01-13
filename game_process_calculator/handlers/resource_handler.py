@@ -3,6 +3,7 @@ import re
 import os
 import requests
 
+from copy import deepcopy
 from typing import List, Optional, Dict, Union
 
 from handlers import BaseDatabaseInteractor
@@ -43,10 +44,11 @@ class ResourceHandler(BaseDatabaseInteractor):
 
     def create(self, resource: Resource) -> Resource:
         resources = self.resources
-        resource.id = len(resources)
-        resources.append(resource)
+        new_resource = Resource.build(resource.put())
+        new_resource.id = len(resources)
+        resources.append(new_resource)
         self.save()
-        return resource
+        return new_resource
 
     def filter(self, resource_filter: ResourceFilter) -> List[Resource]:
         resources = self.resources
@@ -54,9 +56,11 @@ class ResourceHandler(BaseDatabaseInteractor):
         return resources
 
     def update(self, resource: Resource) -> None:
-        old_resource = self.filter(resource_filter=ResourceFilter(uid=[resource.uid]))[0]
-        self.resources[old_resource.id] = resource
+        updated_resource = self.filter(resource_filter=ResourceFilter(uid=[resource.uid]))[0]
+        updated_resource.update(resource)
+        self.resources[updated_resource.id] = updated_resource
         self.save()
+        return deepcopy(resource)
 
     def delete(self, resource: Resource) -> None:
         resource.deleted = True

@@ -76,9 +76,7 @@ class ProjectTest(MyTestCase):
         self.ph.create(project=project1)
         self.ph.create(project=project2)
         self.ph.create(project=project3)
-        filter1 = ProjectFilter(name=['Testing2'])
-        delete_project = self.ph.filter(project_filter=filter1)[0]
-        self.ph.delete(project=delete_project)
+        self.ph.delete(project=project2)
 
         filter2 = ProjectFilter()
         updated_projects = self.ph.filter(project_filter=filter2)

@@ -201,6 +201,31 @@ class DataTest(MyTestCase):
         update_workflow.name = 'Updated Workflow'
         self.dh.update_workflow(update_workflow)
 
+        # Delete Records
+        self.dh.delete_project(update_project)
+
+        self.dh.delete_resource(update_resource)
+
+        self.dh.delete_process(update_process)
+
+        self.dh.delete_workflow(update_workflow)
+
+        # UID lists
+        final_project_uids = self.dh.filter_projects(ProjectFilter())
+        final_resource_uids = self.dh.filter_resources(ResourceFilter())
+        final_process_uids = self.dh.filter_processes(ProcessFilter())
+        final_workflow_uids = self.dh.filter_workflows(WorkflowFilter())
+
+        print(f"project_uids: {len(project_uids), len(final_project_uids)}")
+        print(f"resource_uids: {len(resource_uids), len(final_resource_uids)}")
+        print(f"process_uids: {len(process_uids), len(final_process_uids)}")
+        print(f"workflow_uids: {len(workflow_uids), len(final_workflow_uids)}")
+
+        self.assertEqual(len(project_uids), len(final_project_uids) + 1)
+        self.assertEqual(len(resource_uids), len(final_resource_uids) + 1)
+        self.assertEqual(len(process_uids), len(final_process_uids) + 1)
+        self.assertEqual(len(workflow_uids), len(final_workflow_uids) + 1)
+
     # def test_fail_to_update_locked_parameters(self):
     #     pass
 
