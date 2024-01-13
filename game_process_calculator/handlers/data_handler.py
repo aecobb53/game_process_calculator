@@ -73,12 +73,14 @@ class DataHandler:
             raise ValueError('Process name already exists')
 
         resources = self.resource_handler.filter(ResourceFilter(project_uid=[process.project_uid]))
-        for consume_uid in process.consume_uids:
-            if consume_uid not in [r.uid for r in resources]:
-                raise ValueError('Consume Resource not found')
-        for produce_uid in process.produce_uids:
-            if produce_uid not in [r.uid for r in resources]:
-                raise ValueError('Produce Resource not found')
+        if process.consume_uids is not None:
+            for consume_uid in process.consume_uids:
+                if consume_uid not in [r.uid for r in resources]:
+                    raise ValueError('Consume Resource not found')
+        if process.produce_uids is not None:
+            for produce_uid in process.produce_uids:
+                if produce_uid not in [r.uid for r in resources]:
+                    raise ValueError('Produce Resource not found')
 
         self.process_handler.create(process)
 
@@ -90,9 +92,10 @@ class DataHandler:
             raise ValueError('Workflow name already exists')
 
         processes = self.process_handler.filter(ProcessFilter(project_uid=[workflow.project_uid]))
-        for process_uid in workflow.process_uids:
-            if process_uid not in [p.uid for p in processes]:
-                raise ValueError('Process not found')
+        if workflow.process_uids is not None:
+            for process_uid in workflow.process_uids:
+                if process_uid not in [p.uid for p in processes]:
+                    raise ValueError('Process not found')
 
         self.workflow_handler.create(workflow)
 

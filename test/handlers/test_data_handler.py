@@ -1,6 +1,8 @@
 import json
 import re
 import os
+
+from uuid import uuid4
 from time import process_time
 from turtle import update
 
@@ -226,21 +228,105 @@ class DataTest(MyTestCase):
         self.assertEqual(len(process_uids), len(final_process_uids) + 1)
         self.assertEqual(len(workflow_uids), len(final_workflow_uids) + 1)
 
-    # def test_fail_to_update_locked_parameters(self):
-    #     pass
+    def test_fail_to_update_locked_parameters(self):
+        project1 = Project(name='Testing Project 1')
+        self.dh.create_project(project1)
 
-    # def test_duplicate_project(self):
-    #     pass
+        with self.assertRaises(Exception) as context:
+            project1.uid = str(uuid4())
+            self.dh.update_process(project1)
+        self.assertEqual('UID already set', str(context.exception))
 
-    # def test_duplicate_resource(self):
-    #     pass
+    def test_duplicate_project(self):
+        project1 = Project(name='Project')
+        self.dh.create_project(project1)
+        project2 = Project(name='Project')
 
-    # def test_duplicate_process(self):
-    #     pass
+        with self.assertRaises(Exception) as context:
+            self.dh.create_project(project2)
+        self.assertEqual('Project name already exists', str(context.exception))
 
-    # def test_fail_to_create_resource_due_to_missing_records(self):
-    #     pass
+    def test_duplicate_resource(self):
+        project1 = Project(name='Project')
+        self.dh.create_project(project1)
 
-    # def test_fail_to_create_process_due_to_missing_records(self):
-    #     pass
+        resource1 = Resource(name='Resource', project_uid=project1.uid)
+        self.dh.create_resource(resource1)
+        resource2 = Resource(name='Resource', project_uid=project1.uid)
 
+        with self.assertRaises(Exception) as context:
+            self.dh.create_resource(resource2)
+        self.assertEqual('Resource name already exists', str(context.exception))
+
+    def test_duplicate_process(self):
+        project1 = Project(name='Project')
+        self.dh.create_project(project1)
+
+        process1 = Process(name='Process', project_uid=project1.uid)
+        self.dh.create_process(process1)
+        process2 = Process(name='Process', project_uid=project1.uid)
+        with self.assertRaises(Exception) as context:
+            self.dh.create_process(process2)
+        self.assertEqual('Process name already exists', str(context.exception))
+
+    def test_duplicate_workflow(self):
+        project1 = Project(name='Project')
+        self.dh.create_project(project1)
+        process1 = Process(name='Process', project_uid=project1.uid)
+        self.dh.create_process(process1)
+
+        workflow1 = Workflow(name='Workflow', project_uid=project1.uid,
+            process_uids=[process1.uid], process_type=ProcessType.LINEAR)
+        self.dh.create_workflow(workflow1)
+        workflow2 = Workflow(name='Workflow', project_uid=project1.uid,
+            process_uids=[process1.uid], process_type=ProcessType.LINEAR)
+
+        with self.assertRaises(Exception) as context:
+            self.dh.create_workflow(workflow2)
+        self.assertEqual('Workflow name already exists', str(context.exception))
+
+    def test_fail_to_create_resource_due_to_missing_records(self):
+        project1 = Project(name='Project')
+        resource1 = Resource(name='Resource', project_uid=project1.uid)
+
+        with self.assertRaises(Exception) as context:
+            self.dh.create_resource(resource1)
+        self.assertEqual('Project not found', str(context.exception))
+
+    def test_fail_to_create_process_due_to_missing_records(self):
+        project1 = Project(name='Project')
+        resource1 = Resource(name='Resource1', project_uid=project1.uid)
+        resource2 = Resource(name='Resource2', project_uid=project1.uid)
+        process1 = Process(name='Process', project_uid=project1.uid)
+
+        with self.assertRaises(Exception) as context:
+            self.dh.create_process(process1)
+        self.assertEqual('Project not found', str(context.exception))
+
+        self.dh.create_project(project1)
+        process1.consume_uids = {resource1.uid: 1}
+        with self.assertRaises(Exception) as context:
+            self.dh.create_process(process1)
+        self.assertEqual('Consume Resource not found', str(context.exception))
+
+        process1.consume_uids = None
+        process1.produce_uids = {resource2.uid: 1}
+        with self.assertRaises(Exception) as context:
+            self.dh.create_process(process1)
+        self.assertEqual('Produce Resource not found', str(context.exception))
+
+
+    def test_fail_to_create_workflow_due_to_missing_records(self):
+        project1 = Project(name='Project')
+        process1 = Process(name='Process', project_uid=project1.uid)
+        workflow = Workflow(name='Workflow', project_uid=project1.uid,
+            process_uids=[process1.uid], process_type=ProcessType.LINEAR)
+
+        with self.assertRaises(Exception) as context:
+            self.dh.create_workflow(workflow)
+        self.assertEqual('Project not found', str(context.exception))
+
+        self.dh.create_project(project1)
+        with self.assertRaises(Exception) as context:
+            self.dh.create_workflow(workflow)
+        self.assertEqual('Process not found', str(context.exception))
