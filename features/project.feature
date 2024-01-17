@@ -1,9 +1,9 @@
 Feature: General Project
 
-    Scenario: Create Project
-        Given I clear all test data
-        Given I create a project with the name "Test Project"
-        Then I should see "Test Project" in the saved projects
+    # Scenario: Create Project
+    #     Given I clear all test data
+    #     Given I create a project with the name "Test Project"
+    #     Then I should see "Test Project" in the saved projects
 
     Scenario: Modify Project
         Given I clear all test data

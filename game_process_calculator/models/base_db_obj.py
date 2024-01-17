@@ -22,6 +22,18 @@ class BaseDBObj(BaseModel):
     active: Optional[bool] = None
     deleted: Optional[bool] = False
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        print(f"UID going into this {self.uid}")
+        if self.uid is None:
+            self.uid = str(uuid4())
+        if self.creation_datetime is None:
+            self.creation_datetime = datetime.utcnow()
+        if self.update_datetime is None:
+            self.update_datetime = datetime.utcnow()
+        if self.active is None:
+            self.active = True
+
     @property
     def id(self):
         return self.internal_id
@@ -41,17 +53,6 @@ class BaseDBObj(BaseModel):
         if self.internal_uid is not None:
             raise ValueError('UID already set')
         self.internal_uid = value
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.uid is None:
-            self.uid = str(uuid4())
-        if self.creation_datetime is None:
-            self.creation_datetime = datetime.utcnow()
-        if self.update_datetime is None:
-            self.update_datetime = datetime.utcnow()
-        if self.active is None:
-            self.active = True
 
     @classmethod
     def build(cls, dct):

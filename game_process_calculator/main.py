@@ -112,6 +112,12 @@ async def update_project(project_uuid: str, project: Project):
     logger.debug(f"Project uuid: {project_uuid}")
 
     project_handler = ProjectHandler()
+    print('handler created')
+    print(project_handler._projects)
+    return
+    projects = project_handler.filter()
+    logger.debug('filter in put call')
+    logger.debug(projects)
     # project_filter = ProjectFilter(uid=[project_uuid])
     # projects = project_handler.filter(project_filter=project_filter)
     # print(projects)

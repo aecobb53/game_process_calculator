@@ -17,9 +17,12 @@ class Project(BaseDBObj):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        print('project being inited')
 
     @classmethod
     def build(cls, dct):
+        print('in build fn')
+        print(json.dumps(dct, indent=2))
         utils = Utils()
         content = super().build(dct)
         content.update({

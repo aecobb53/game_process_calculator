@@ -33,11 +33,11 @@ class BaseDatabaseInteractor(BaseModel):
         self.save_dir = os.path.join(os.path.dirname(os.getcwd()), 'data')
 
 
-    def save_file(self, path: str, content: Dict):
-        with open(path, 'w') as f:
-            json.dump(content, f, indent=4)
+    # def save_file(self, path: str, content: Dict):
+    #     with open(path, 'w') as f:
+    #         json.dump(content, f, indent=4)
 
-    def load_file(cls, path):
-        with open(path, 'r') as jf:
-            content = json.load(jf)
-        return content
+    # def load_file(cls, path):
+    #     with open(path, 'r') as jf:
+    #         content = json.load(jf)
+    #     return content

@@ -6,11 +6,12 @@ import requests
 from copy import deepcopy
 from typing import List, Optional, Dict, Union
 
-from handlers import BaseDatabaseInteractor
+# from handlers import BaseDatabaseInteractor
+from handlers import BaseHandler
 from models import Project, ProjectFilter
 
 
-class ProjectHandler(BaseDatabaseInteractor):
+class ProjectHandler(BaseHandler):
     save_filename: Optional[str] = None
     _projects: Optional[List[Project]] = None
 
@@ -22,6 +23,7 @@ class ProjectHandler(BaseDatabaseInteractor):
 
     @property
     def projects(self) -> List[Project]:
+        print('referencing self._projects')
         if self._projects is None:
             self.load()
         return self._projects
@@ -51,7 +53,10 @@ class ProjectHandler(BaseDatabaseInteractor):
         return new_project
 
     def filter(self, project_filter: ProjectFilter) -> List[Project]:
+        print('in filter about to grab projects')
+        print(self._projects)
         projects = self.projects
+        print(projects)
         projects = project_filter.filter_results(projects)
         return projects
 
