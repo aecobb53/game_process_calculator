@@ -56,6 +56,9 @@ class ProjectHandler(BaseDatabaseInteractor):
         return projects
 
     def update(self, project: Project) -> None:
+        print('filtering for updating')
+        print(project.uid)
+        print(self.filter(project_filter=ProjectFilter()))
         updated_project = self.filter(project_filter=ProjectFilter(uid=[project.uid]))[0]
         updated_project.update(project)
         self.projects[updated_project.id] = updated_project

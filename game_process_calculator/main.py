@@ -88,7 +88,7 @@ async def create_project(project: Project):
 # create_process
 # create_workflow
 
-# Filters
+# Filter Endpoints
 @app.get('/projects')
 # async def create_project(names: Optional[List[str]] = None):
 # async def create_project(requests: Request):
@@ -103,7 +103,27 @@ async def filter_projects(names: Optional[List[str]] = None):
 # filter_resources
 # filter_processes
 # filter_workflows
+
+# Update Endpoints
 # update_project
+@app.put('/projects/{project_uuid}')
+async def update_project(project_uuid: str, project: Project):
+    logger.debug('PUT on /projects')
+    logger.debug(f"Project uuid: {project_uuid}")
+
+    project_handler = ProjectHandler()
+    # project_filter = ProjectFilter(uid=[project_uuid])
+    # projects = project_handler.filter(project_filter=project_filter)
+    # print(projects)
+    # update_project = projects[0]
+    # print(update_project)
+    # update_project.update(project)
+    updated_project = project_handler.update(project=project)
+
+
+    # project_handler = ProjectHandler()
+    # new_project = project_handler.create(project)
+    return update_project.put()
 # update_resource
 # update_process
 # update_workflow

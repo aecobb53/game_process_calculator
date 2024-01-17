@@ -46,7 +46,7 @@ def capture_project_uid(context, name, index):
         context.tracked_project_uids[index] = project['uid']
 
 @when('I modify the project at index "{index}" name to "{name}"')
-def given_create_project(context, index, name):
+def when_update_project(context, index, name):
     print('')
     print('')
     print('HERE')
@@ -62,10 +62,10 @@ def given_create_project(context, index, name):
     # payload = {
     #     'name': name
     # }
-    # resp = requests.put(f"{base_url}/projects", json=payload)
-    # print(resp)
-    # print(resp.json())
-    # assert resp.ok
+    resp = requests.put(f"{base_url}/projects/{payload['uid']}", json=payload)
+    print(resp)
+    print(resp.json())
+    assert resp.ok
     assert False
 
 @then('I should see "{name}" in the saved projects')
