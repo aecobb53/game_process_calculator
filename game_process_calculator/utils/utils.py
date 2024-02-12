@@ -155,7 +155,6 @@ class Utils:
             header.strip()
 
             toc_line = f"{indent * spaces * ' '}- [{header}](#{header.replace(' ', '-').lower()})"
-            print(toc_line)
 
     def convert_to_camel(self, item):
         result = []

@@ -1,3 +1,4 @@
+import json
 import os
 import logging
 
@@ -67,16 +68,13 @@ async def root(requests: Request):
     if str(os.environ['TESTING']) == '1':
         logger.debug('CLEARING DATA')
         project_handler = ProjectHandler()
-        print(os.listdir(project_handler.save_dir))
         for fl in os.listdir(project_handler.save_dir):
             os.remove(os.path.join(project_handler.save_dir, fl))
-        print(os.listdir(project_handler.save_dir))
         logger.debug('DATA CLEARED')
         return {'data_clearing': 'True'}
 
 # Create Endpoints
 @app.post('/projects')
-# @app.post('/projects', response_class=ORJSONResponse)
 async def create_project(project: Project):
     logger.debug('POST on /projects')
     project_handler = ProjectHandler()
@@ -90,53 +88,111 @@ async def create_project(project: Project):
 
 # Filter Endpoints
 @app.get('/projects')
-# async def create_project(names: Optional[List[str]] = None):
-# async def create_project(requests: Request):
 async def filter_projects(names: Optional[List[str]] = None):
     logger.debug('GET on /projects')
     project_handler = ProjectHandler()
     project_filter = ProjectFilter()
     projects = project_handler.filter(project_filter=project_filter)
-    print(projects)
     return {'projects': [p.put() for p in projects]}
 # filter_projects
 # filter_resources
 # filter_processes
 # filter_workflows
 
+# Find Specific Endpoints
+@app.get('/project/{project_uid}')
+async def find_specific_project(project_uid: str = None):
+    logger.debug('GET on /project')
+    logger.debug(f"Project uuid: {project_uid}")
+    project_handler = ProjectHandler()
+    project_filter = ProjectFilter(uid=[project_uid])
+    projects = project_handler.filter(project_filter=project_filter)
+
+    if len(projects) == 0:
+        raise HTTPException(status_code=404, detail="Project not found")
+    elif len(projects) == 1:
+        return projects[0].put()
+    else:
+        raise HTTPException(status_code=404, detail="Multiple projects found")
+# find_specific_project
+# find_specific_resource
+# find_specific_processe
+# find_specific_workflow
+
 # Update Endpoints
 # update_project
-@app.put('/projects/{project_uuid}')
+@app.put('/project/{project_uuid}')
 async def update_project(project_uuid: str, project: Project):
-    logger.debug('PUT on /projects')
+    logger.debug('PUT on /project')
     logger.debug(f"Project uuid: {project_uuid}")
+    logger.debug(project)
+    project.uid = project_uuid
 
     project_handler = ProjectHandler()
-    print('handler created')
-    print(project_handler._projects)
-    return
-    projects = project_handler.filter()
-    logger.debug('filter in put call')
-    logger.debug(projects)
-    # project_filter = ProjectFilter(uid=[project_uuid])
-    # projects = project_handler.filter(project_filter=project_filter)
-    # print(projects)
-    # update_project = projects[0]
-    # print(update_project)
-    # update_project.update(project)
-    updated_project = project_handler.update(project=project)
-
-
-    # project_handler = ProjectHandler()
-    # new_project = project_handler.create(project)
-    return update_project.put()
+    try:
+        updated_project = project_handler.update(project=project)
+    except IndexError:
+        logger.warning('Better error handling needs to be added!!!!')
+        raise HTTPException(status_code=404, detail="Multiple projects found")
+    logger.debug(f"Updated project: {updated_project}")
+    return updated_project.put()
 # update_resource
 # update_process
 # update_workflow
+
+# Delete Endpoints
 # delete_project
+@app.delete('/project/{project_uid}')
+async def delete_specific_project(project_uid: str = None):
+    logger.debug('DELETE on /project')
+    logger.debug(f"Project uuid: {project_uid}")
+    project_handler = ProjectHandler()
+    try:
+        updated_project = project_handler.delete(project_uid=project_uid)
+    except IndexError:
+        logger.warning('Better error handling needs to be added!!!!')
+        raise HTTPException(status_code=404, detail="Multiple projects found")
+    logger.debug(f"Deleted project: {updated_project}")
+    return updated_project.put()
 # delete_resource
 # delete_process
 # delete_workflow
+
+# Export Endpoints
+# export_projects
+@app.get('/export-projects')
+async def export_projects(requests: Request):
+    logger.debug('GET on /export-projects')
+    project_handler = ProjectHandler()
+    content = project_handler.export_projects()
+    return content
+# export_resources
+# export_processs
+# export_workflows
+# export_databases
+
+# Import Endpoints
+# import_projects
+@app.post('/import-projects')
+async def import_projects(request: Request):
+    logger.debug('POST on /import-projects')
+    imported_projects = await request.json()
+    logger.debug(imported_projects)
+    project_handler = ProjectHandler()
+    projects = project_handler.import_projects(dct=imported_projects)
+    return {'projects': [p.put() for p in projects]}
+# import_resources
+# import_processs
+# import_workflows
+# import_databases
+
+
+
+
+
+
+
+
 
 # # @app.get('/main-page', response_class=HTMLResponse)
 # # async def current_builds(requests: Request):

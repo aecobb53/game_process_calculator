@@ -17,13 +17,10 @@ class Project(BaseDBObj):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        print('project being inited')
 
     @classmethod
     def build(cls, dct):
-        print('in build fn')
-        print(json.dumps(dct, indent=2))
-        utils = Utils()
+        # utils = Utils()
         content = super().build(dct)
         content.update({
             'name': dct.get('name'),
@@ -32,7 +29,7 @@ class Project(BaseDBObj):
         return obj
 
     def put(self):
-        utils = Utils()
+        # utils = Utils()
         content = super().put()
         content.update({
             'name': self.name,

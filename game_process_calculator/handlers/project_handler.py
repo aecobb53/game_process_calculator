@@ -1,3 +1,4 @@
+from ast import Index
 import json
 import re
 import os
@@ -23,7 +24,6 @@ class ProjectHandler(BaseHandler):
 
     @property
     def projects(self) -> List[Project]:
-        print('referencing self._projects')
         if self._projects is None:
             self.load()
         return self._projects
@@ -53,23 +53,55 @@ class ProjectHandler(BaseHandler):
         return new_project
 
     def filter(self, project_filter: ProjectFilter) -> List[Project]:
-        print('in filter about to grab projects')
-        print(self._projects)
         projects = self.projects
-        print(projects)
         projects = project_filter.filter_results(projects)
         return projects
 
-    def update(self, project: Project) -> None:
-        print('filtering for updating')
-        print(project.uid)
-        print(self.filter(project_filter=ProjectFilter()))
+    def update(self, project: Project) -> Project:
+        projects = self.filter(ProjectFilter(uid=[project.uid]))
+
+        if len(projects) == 0:
+            raise IndexError(f"Project with uid {project.uid} not found")
+        elif len(projects) > 1:
+            raise IndexError(f"Project with uid {project.uid} returns multiple results")
+
         updated_project = self.filter(project_filter=ProjectFilter(uid=[project.uid]))[0]
         updated_project.update(project)
         self.projects[updated_project.id] = updated_project
         self.save()
         return deepcopy(project)
 
-    def delete(self, project: Project) -> None:
-        project.deleted = True
-        self.update(project=project)
+    def delete(self, project_uid: int) -> Project:
+        projects = self.filter(ProjectFilter(uid=[project_uid]))
+
+        if len(projects) == 0:
+            raise IndexError(f"Project with uid {project_uid} not found")
+        elif len(projects) > 1:
+            raise IndexError(f"Project with uid {project_uid} returns multiple results")
+
+        delete_project = self.filter(project_filter=ProjectFilter(uid=[project_uid]))[0]
+        delete_project.delete()
+        self.projects[delete_project.id] = delete_project
+        self.save()
+        return deepcopy(delete_project)
+
+    def export_projects(self) -> Dict:
+        print('in export projects')
+        projects = self.filter(ProjectFilter())
+        print(projects)
+        return {'projects': [p.put() for p in projects]}
+
+    def import_projects(self, dct) -> List[Project]:
+        self._projects = []
+        projects = self.projects
+        output = []
+        for project_dct in dct['projects']:
+            project = Project.build(project_dct)
+            output.append(project)
+            projects.append(project)
+        self.save()
+        return output
+
+
+        # project.deleted = True
+        # self.update(project=project)

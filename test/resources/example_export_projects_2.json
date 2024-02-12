@@ -1,0 +1,15 @@
+{
+    "projects": [
+        {
+            "id": 0,
+            "uid": "7fd49620-60fb-47d0-9bca-1b1f70b9407b",
+            "creation_datetime": "2020-01-01T00:00:00.000000Z",
+            "update_datetime": "2020-01-02T00:00:00.000000Z",
+            "description": "An example for import and export",
+            "notes": null,
+            "active": null,
+            "deleted": false,
+            "name": "Test Project"
+        }
+    ]
+}

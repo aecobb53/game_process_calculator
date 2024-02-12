@@ -3,7 +3,7 @@ import re
 import os
 
 from copy import deepcopy
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator, FieldValidationInfo
 from enum import Enum
 from typing import List, Optional, Dict, Union
 from datetime import date, datetime, timedelta
@@ -22,17 +22,26 @@ class BaseDBObj(BaseModel):
     active: Optional[bool] = None
     deleted: Optional[bool] = False
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        print(f"UID going into this {self.uid}")
-        if self.uid is None:
-            self.uid = str(uuid4())
-        if self.creation_datetime is None:
-            self.creation_datetime = datetime.utcnow()
-        if self.update_datetime is None:
-            self.update_datetime = datetime.utcnow()
-        if self.active is None:
-            self.active = True
+    @field_validator('internal_uid')
+    # @classmethod
+    def validate_internal_uid(cls, v: str, info: FieldValidationInfo):
+        if v is None:
+            uid = str(uuid4())
+        else:
+            uid = v
+        return uid
+
+    @field_validator('creation_datetime')
+    # @classmethod
+    def validate_creation_datetime(cls, v: str, info: FieldValidationInfo):
+        if v is None:
+            uid = datetime.utcnow()
+        else:
+            uid = v
+        return uid
+
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
 
     @property
     def id(self):
@@ -60,8 +69,8 @@ class BaseDBObj(BaseModel):
         content = {
             'internal_id': dct.get('id'),
             'internal_uid': dct.get('uid'),
-            'creation_datetime': utils.time_str_to_obj(dct.get('creation_datetime')),
-            'update_datetime': utils.time_str_to_obj(dct.get('update_datetime')),
+            'creation_datetime': utils.time_str_to_obj(dct.get('creation_datetime'), allow_none=True),
+            'update_datetime': utils.time_str_to_obj(dct.get('update_datetime'), allow_none=True),
             'description': dct.get('description'),
             'notes': dct.get('notes'),
             'active': dct.get('active'),
@@ -74,8 +83,8 @@ class BaseDBObj(BaseModel):
         content = {
             'id': self.id,
             'uid': self.uid,
-            'creation_datetime': utils.time_obj_to_str(self.creation_datetime),
-            'update_datetime': utils.time_obj_to_str(self.update_datetime),
+            'creation_datetime': utils.time_obj_to_str(self.creation_datetime, allow_none=True),
+            'update_datetime': utils.time_obj_to_str(self.update_datetime, allow_none=True),
             'description': self.description,
             'notes': self.notes,
             'active': self.active,
@@ -90,6 +99,10 @@ class BaseDBObj(BaseModel):
         self.active = obj.active
         self.deleted = obj.deleted
 
+        self.update_datetime = datetime.utcnow()
+
+    def delete(self) -> None:
+        self.deleted = True
         self.update_datetime = datetime.utcnow()
 
 
