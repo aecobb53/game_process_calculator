@@ -19,7 +19,7 @@ from models import (
     Workflow,
     WorkflowFilter,
     ProcessType)
-from handlers import ProjectHandler
+from handlers import ProjectHandler, ResourceHandler
 
 appname = 'game_process_calculator'
 
@@ -74,6 +74,7 @@ async def root(requests: Request):
         return {'data_clearing': 'True'}
 
 # Create Endpoints
+# create_project
 @app.post('/projects')
 async def create_project(project: Project):
     logger.debug('POST on /projects')
@@ -81,12 +82,18 @@ async def create_project(project: Project):
     new_project = project_handler.create(project)
     return new_project.put()
 
-# create_project
+@app.post('/resources')
+async def create_resource(resource: Resource):
+    logger.debug('POST on /resources')
+    resource_handler = ResourceHandler()
+    new_resource = resource_handler.create(resource)
+    return new_resource.put()
 # create_resource
 # create_process
 # create_workflow
 
 # Filter Endpoints
+# filter_projects
 @app.get('/projects')
 async def filter_projects(names: Optional[List[str]] = None):
     logger.debug('GET on /projects')
@@ -94,8 +101,15 @@ async def filter_projects(names: Optional[List[str]] = None):
     project_filter = ProjectFilter()
     projects = project_handler.filter(project_filter=project_filter)
     return {'projects': [p.put() for p in projects]}
-# filter_projects
+
 # filter_resources
+@app.get('/resources')
+async def filter_projects(names: Optional[List[str]] = None):
+    logger.debug('GET on /resources')
+    resource_handler = ResourceHandler()
+    resource_filter = ResourceFilter()
+    resources = resource_handler.filter(resource_filter=resource_filter)
+    return {'resources': [p.put() for p in resources]}
 # filter_processes
 # filter_workflows
 

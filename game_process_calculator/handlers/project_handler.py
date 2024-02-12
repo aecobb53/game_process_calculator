@@ -86,9 +86,7 @@ class ProjectHandler(BaseHandler):
         return deepcopy(delete_project)
 
     def export_projects(self) -> Dict:
-        print('in export projects')
         projects = self.filter(ProjectFilter())
-        print(projects)
         return {'projects': [p.put() for p in projects]}
 
     def import_projects(self, dct) -> List[Project]:
@@ -101,7 +99,3 @@ class ProjectHandler(BaseHandler):
             projects.append(project)
         self.save()
         return output
-
-
-        # project.deleted = True
-        # self.update(project=project)

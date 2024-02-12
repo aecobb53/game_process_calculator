@@ -37,7 +37,6 @@ def capture_project_uid(context, name, index):
         'name': name
     }
     resp = requests.get(f"{base_url}/projects", params=params)
-    # print(resp.json())
     assert resp.ok
     projects = resp.json()['projects']
     assert len(projects) == 1

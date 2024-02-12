@@ -6,11 +6,12 @@ import requests
 from copy import deepcopy
 from typing import List, Optional, Dict, Union
 
-from handlers import BaseDatabaseInteractor
+# from handlers import BaseDatabaseInteractor
+from handlers import BaseHandler
 from models import Resource, ResourceFilter
 
 
-class ResourceHandler(BaseDatabaseInteractor):
+class ResourceHandler(BaseHandler):
     save_filename: Optional[str] = None
     _resources: Optional[List[Resource]] = None
 
@@ -39,7 +40,7 @@ class ResourceHandler(BaseDatabaseInteractor):
 
     def save(self) -> None:
         os.makedirs(self.save_dir, exist_ok=True)
-        content = [p.put() for p in self.resources]
+        content = [r.put() for r in self.resources]
         self.save_file(self.save_file_path, content)
 
     def create(self, resource: Resource) -> Resource:
@@ -55,13 +56,13 @@ class ResourceHandler(BaseDatabaseInteractor):
         resources = resource_filter.filter_results(resources)
         return resources
 
-    def update(self, resource: Resource) -> None:
-        updated_resource = self.filter(resource_filter=ResourceFilter(uid=[resource.uid]))[0]
-        updated_resource.update(resource)
-        self.resources[updated_resource.id] = updated_resource
-        self.save()
-        return deepcopy(resource)
+    # def update(self, resource: Resource) -> None:
+    #     updated_resource = self.filter(resource_filter=ResourceFilter(uid=[resource.uid]))[0]
+    #     updated_resource.update(resource)
+    #     self.resources[updated_resource.id] = updated_resource
+    #     self.save()
+    #     return deepcopy(resource)
 
-    def delete(self, resource: Resource) -> None:
-        resource.deleted = True
-        self.update(resource=resource)
+    # def delete(self, resource: Resource) -> None:
+    #     resource.deleted = True
+    #     self.update(resource=resource)
