@@ -1,0 +1,129 @@
+{
+    "processes": [
+        {
+            "id": 0,
+            "uid": "56dd9c19-1c06-494d-9984-d5a13042fbbd",
+            "creation_datetime": "2024-02-22T23:57:32.284276Z",
+            "update_datetime": "2024-02-22T23:57:32.294039Z",
+            "description": null,
+            "notes": null,
+            "active": null,
+            "deleted": false,
+            "name": "Iron Gear",
+            "project_uid": "d3a7a6ca-0675-4322-9cfa-8df457928460",
+            "consume_uids": {
+                "1c1f094a-9fc8-4b5a-9f7d-675ffea4cdb7": 2.0
+            },
+            "produce_uids": {
+                "44a92830-157a-4d9b-af90-df156d81f85c": 1.5
+            },
+            "process_time_seconds": null,
+            "rest_time_seconds": null
+        },
+        {
+            "id": 1,
+            "uid": "22707712-253d-4fda-8b3a-0724fb1f4052",
+            "creation_datetime": "2024-02-22T23:57:32.298490Z",
+            "update_datetime": "2024-02-22T23:57:32.307801Z",
+            "description": null,
+            "notes": null,
+            "active": null,
+            "deleted": false,
+            "name": "Copper Cable",
+            "project_uid": "d3a7a6ca-0675-4322-9cfa-8df457928460",
+            "consume_uids": {
+                "87547731-3eca-464d-81c2-88215ed222f4": 1.0
+            },
+            "produce_uids": {
+                "f3ef60ec-4de1-4a82-9605-ee8e5bc831a9": 2.0
+            },
+            "process_time_seconds": null,
+            "rest_time_seconds": null
+        },
+        {
+            "id": 2,
+            "uid": "503147cf-50c1-4bd7-93f4-549b521ad4a7",
+            "creation_datetime": "2024-02-22T23:57:32.312967Z",
+            "update_datetime": "2024-02-22T23:57:32.326740Z",
+            "description": null,
+            "notes": null,
+            "active": null,
+            "deleted": false,
+            "name": "Electronic circuit",
+            "project_uid": "d3a7a6ca-0675-4322-9cfa-8df457928460",
+            "consume_uids": {
+                "f3ef60ec-4de1-4a82-9605-ee8e5bc831a9": 3.0,
+                "1c1f094a-9fc8-4b5a-9f7d-675ffea4cdb7": 1.0
+            },
+            "produce_uids": {
+                "b3999e3c-47b3-48bd-bf83-8ada3aefba7d": 1.0
+            },
+            "process_time_seconds": null,
+            "rest_time_seconds": null
+        },
+        {
+            "id": 3,
+            "uid": "c3a1575b-cf71-44a0-8bc1-efc50d9ec5f5",
+            "creation_datetime": "2024-02-22T23:57:32.331398Z",
+            "update_datetime": "2024-02-22T23:57:32.345435Z",
+            "description": null,
+            "notes": null,
+            "active": null,
+            "deleted": false,
+            "name": "Transport Belt",
+            "project_uid": "d3a7a6ca-0675-4322-9cfa-8df457928460",
+            "consume_uids": {
+                "44a92830-157a-4d9b-af90-df156d81f85c": 1.0,
+                "1c1f094a-9fc8-4b5a-9f7d-675ffea4cdb7": 1.0
+            },
+            "produce_uids": {
+                "8fe108cc-1878-4a51-a29d-1a17e84dd952": 2.0
+            },
+            "process_time_seconds": null,
+            "rest_time_seconds": null
+        },
+        {
+            "id": 4,
+            "uid": "8a724c9e-628d-4214-b1b5-237d6b91e512",
+            "creation_datetime": "2024-02-22T23:57:32.350129Z",
+            "update_datetime": "2024-02-22T23:57:32.367123Z",
+            "description": null,
+            "notes": null,
+            "active": null,
+            "deleted": false,
+            "name": "Inserter",
+            "project_uid": "d3a7a6ca-0675-4322-9cfa-8df457928460",
+            "consume_uids": {
+                "b3999e3c-47b3-48bd-bf83-8ada3aefba7d": 1.0,
+                "44a92830-157a-4d9b-af90-df156d81f85c": 1.0,
+                "1c1f094a-9fc8-4b5a-9f7d-675ffea4cdb7": 1.0
+            },
+            "produce_uids": {
+                "b9c60efb-b0b4-4a55-aae0-5fb0e4236752": 1.0
+            },
+            "process_time_seconds": null,
+            "rest_time_seconds": null
+        },
+        {
+            "id": 5,
+            "uid": "6ec90794-b282-423e-a295-5fceb06cbf35",
+            "creation_datetime": "2024-02-22T23:57:32.372640Z",
+            "update_datetime": "2024-02-22T23:57:32.386560Z",
+            "description": null,
+            "notes": null,
+            "active": null,
+            "deleted": false,
+            "name": "Green Science Pack",
+            "project_uid": "d3a7a6ca-0675-4322-9cfa-8df457928460",
+            "consume_uids": {
+                "b9c60efb-b0b4-4a55-aae0-5fb0e4236752": 1.0,
+                "8fe108cc-1878-4a51-a29d-1a17e84dd952": 1.0
+            },
+            "produce_uids": {
+                "1e686923-ce01-4ca9-a218-e300571d14b6": 1.0
+            },
+            "process_time_seconds": null,
+            "rest_time_seconds": null
+        }
+    ]
+}

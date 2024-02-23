@@ -1,0 +1,18 @@
+{
+    "workflows": [
+        {
+            "id": 0,
+            "uid": "354b5724-289c-4f66-b796-3c3fc2f0416d",
+            "creation_datetime": "2024-02-23T02:18:41.270801Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "active": null,
+            "deleted": false,
+            "name": "Test Workflow",
+            "project_uid": "751be1ac-60c3-4882-9fa9-f5d7ae3c30ec",
+            "process_uids": null,
+            "process_type": "LINEAR"
+        }
+    ]
+}

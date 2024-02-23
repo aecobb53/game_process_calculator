@@ -1,0 +1,20 @@
+{
+    "resources": [
+        {
+            "id": 0,
+            "uid": null,
+            "creation_datetime": null,
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "active": null,
+            "deleted": false,
+            "name": "Test Resource",
+            "project_uid": null,
+            "acquisition_uids": null,
+            "desposal_uids": null,
+            "value_obj_uid": null,
+            "value_amount": null
+        }
+    ]
+}

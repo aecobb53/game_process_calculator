@@ -1,0 +1,20 @@
+{
+    "resources": [
+        {
+            "id": 0,
+            "uid": "5d8d8c04-4879-4e1a-b213-aa53e333b4a3",
+            "creation_datetime": "2024-02-14T21:47:26.285908Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "active": null,
+            "deleted": false,
+            "name": "Test Resource",
+            "project_uid": "62855fc0-9ecc-4d84-9f49-c5dc93be6d41",
+            "acquisition_uids": null,
+            "desposal_uids": null,
+            "value_obj_uid": null,
+            "value_amount": null
+        }
+    ]
+}

@@ -6,11 +6,12 @@ import requests
 from copy import deepcopy
 from typing import List, Optional, Dict, Union
 
-from handlers import BaseDatabaseInteractor
+# from handlers import BaseDatabaseInteractor
+from handlers import BaseHandler
 from models import Process, ProcessFilter
 
 
-class ProcessHandler(BaseDatabaseInteractor):
+class ProcessHandler(BaseHandler):
     save_filename: Optional[str] = None
     _processes: Optional[List[Process]] = None
 
@@ -55,13 +56,47 @@ class ProcessHandler(BaseDatabaseInteractor):
         processes = process_filter.filter_results(processes)
         return processes
 
-    def update(self, process: Process) -> None:
+    def update(self, process: Process) -> Process:
+        processes = self.filter(ProcessFilter(uid=[process.uid]))
+
+        if len(processes) == 0:
+            raise IndexError(f"Process with uid {process.uid} not found")
+        elif len(processes) > 1:
+            raise IndexError(f"Process with uid {process.uid} returns multiple results")
+
         updated_process = self.filter(process_filter=ProcessFilter(uid=[process.uid]))[0]
         updated_process.update(process)
         self.processes[updated_process.id] = updated_process
         self.save()
         return deepcopy(process)
 
-    def delete(self, process: Process) -> None:
-        process.deleted = True
-        self.update(process=process)
+    def delete(self, process_uid: int) -> Process:
+        processes = self.filter(ProcessFilter(uid=[process_uid]))
+
+        if len(processes) == 0:
+            raise IndexError(f"Process with uid {process_uid} not found")
+        elif len(processes) > 1:
+            raise IndexError(f"Process with uid {process_uid} returns multiple results")
+
+        delete_process = self.filter(process_filter=ProcessFilter(uid=[process_uid]))[0]
+        delete_process.delete()
+        self.processes[delete_process.id] = delete_process
+        self.save()
+        return deepcopy(delete_process)
+
+    def export_processes(self) -> Dict:
+        processes = self.filter(ProcessFilter())
+        return {'processes': [p.put() for p in processes]}
+
+    def import_processes(self, dct) -> List[Process]:
+        self._processes = []
+        processes = self.processes
+        output = []
+        print(json.dumps(dct, indent=4))
+        for process_dct in dct['processes']:
+            process = Process.build(process_dct)
+            output.append(process)
+            processes.append(process)
+
+        self.save()
+        return output

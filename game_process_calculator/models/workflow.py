@@ -9,6 +9,7 @@ from datetime import date, datetime, timedelta
 from uuid import uuid4
 
 from utils import Utils
+from pydantic import field_validator, FieldValidationInfo
 from .base_db_obj import BaseDBObj, BaseDBObjFilter
 
 
@@ -21,8 +22,15 @@ class ProcessType(Enum):
 class Workflow(BaseDBObj):
     name: str
     project_uid: str
-    process_uids: Optional[List[str]]  # Process or Workflow UID
-    process_type: ProcessType
+    process_uids: Optional[List[str]] = None  # Process or Workflow UID
+    process_type: Union[ProcessType, str]
+
+    @field_validator('process_type')
+    # @classmethod
+    def validate_process_type(cls, v: str, info: FieldValidationInfo):
+        if not isinstance(v, ProcessType):
+            v = getattr(ProcessType, v)
+        return v
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

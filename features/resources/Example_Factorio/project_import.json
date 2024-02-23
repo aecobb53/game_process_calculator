@@ -1,0 +1,15 @@
+{
+    "projects": [
+        {
+            "id": 0,
+            "uid": "d3a7a6ca-0675-4322-9cfa-8df457928460",
+            "creation_datetime": "2024-02-22T23:57:32.241361Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "active": null,
+            "deleted": false,
+            "name": "Factorio"
+        }
+    ]
+}

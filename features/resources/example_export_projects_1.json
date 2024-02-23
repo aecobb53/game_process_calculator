@@ -1,0 +1,15 @@
+{
+    "projects": [
+        {
+            "id": 0,
+            "uid": null,
+            "creation_datetime": null,
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "active": null,
+            "deleted": false,
+            "name": "Test Project"
+        }
+    ]
+}

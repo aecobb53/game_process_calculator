@@ -42,7 +42,7 @@ class DataHandler:
         if project.name in [p.name for p in projects]:
             raise ValueError('Project name already exists')
 
-        self.project_handler.create(project)
+        return self.project_handler.create(project)
 
     def create_resource(self, resource: Resource):
         self.validate_project_exists(resource.project_uid)
@@ -62,7 +62,7 @@ class DataHandler:
             if resource.value_obj_uid not in resource_uids:
                 raise ValueError('Value Object Resource not found')
 
-        self.resource_handler.create(resource)
+        return self.resource_handler.create(resource)
 
     def create_process(self, process: Process):
         self.validate_project_exists(process.project_uid)
@@ -81,7 +81,7 @@ class DataHandler:
                 if produce_uid not in [r.uid for r in resources]:
                     raise ValueError('Produce Resource not found')
 
-        self.process_handler.create(process)
+        return self.process_handler.create(process)
 
     def create_workflow(self, workflow: Workflow):
         self.validate_project_exists(workflow.project_uid)
@@ -96,7 +96,7 @@ class DataHandler:
                 if process_uid not in [p.uid for p in processes]:
                     raise ValueError('Process not found')
 
-        self.workflow_handler.create(workflow)
+        return self.workflow_handler.create(workflow)
 
     # Filter
     def filter_projects(self, project_filter: ProjectFilter):
@@ -142,16 +142,45 @@ class DataHandler:
 
     # delete
     def delete_project(self, project: Project):
-        self.project_handler.delete(project)
+        return self.project_handler.delete(project)
 
     def delete_resource(self, resource: Resource):
-        self.resource_handler.delete(resource)
+        return self.resource_handler.delete(resource)
 
     def delete_process(self, process: Process):
-        self.process_handler.delete(process)
+        return self.process_handler.delete(process)
 
     def delete_workflow(self, workflow: Workflow):
-        self.workflow_handler.delete(workflow)
+        return self.workflow_handler.delete(workflow)
+
+    def return_complex_workflow_object(self, workflows: List[Workflow]):
+        workflows_dict = []
+        for workflow in workflows:
+            processes = []
+            for process_uid in workflow.process_uids:
+                process = self.filter_processes(ProcessFilter(uid=[process_uid]))
+                assert len(process) == 1  # This needs better error handling
+                process = process[0]
+                consumes_resources = []
+                produces_resources = []
+                if process.consume_uids is not None:
+                    for resource_uid in process.consume_uids:
+                        resource = self.filter_resources(ResourceFilter(uid=[resource_uid]))
+                        assert len(resource) == 1  # This needs better error handling
+                        consumes_resources.append(resource[0].put())
+                if process.produce_uids is not None:
+                    for resource_uid in process.produce_uids:
+                        resource = self.filter_resources(ResourceFilter(uid=[resource_uid]))
+                        assert len(resource) == 1
+                        produces_resources.append(resource[0].put())
+                process_dict = process.put()
+                process_dict['consumes_resources'] = consumes_resources
+                process_dict['produces_resources'] = produces_resources
+                processes.append(process_dict)
+            workflow_dict = workflow.put()
+            workflow_dict['processes'] = processes
+            workflows_dict.append(workflow_dict)
+        return workflows_dict
 
 
 

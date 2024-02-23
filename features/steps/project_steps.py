@@ -1,7 +1,12 @@
+import os
+import json
+
 from behave import *
 # import sys
 # sys.path.append('/home/acobb/git/game_process_calculator/game_process_calculator')
 # from game_process_calculator import ProjectFilter
+
+from step_utils import compare_things
 
 
 import requests
@@ -9,6 +14,7 @@ import requests
 docker_url = 'http://0.0.0.0'
 port = '8203'
 base_url = docker_url + ':' + port
+ft_resources = os.path.join(os.getcwd(), 'features', 'resources')
 
 # @given('I clear all test data')
 # def clear_test_data(context):
@@ -58,7 +64,7 @@ def when_update_project(context, index, name):
     resp = requests.get(f"{base_url}/projects", params=params)
     print(f"Get request for projects code: {resp.status_code}")
     payload = resp.json()['projects'][0]
-    print(f"Modified paylode{payload}")
+    print(f"Modified payload {payload}")
     payload['name'] = name
     resp = requests.put(f"{base_url}/project/{payload['uid']}", json=payload)
     print(resp.ok)
@@ -111,7 +117,45 @@ def then_verify_project_deleted(context, index):
     assert resp.status_code == 404
     assert resp.json() == {'detail': 'Project not found'}
 
+@then('I verify the projects export "{matches_level}" "{file_path}"')
+def verify_export_matches(context, matches_level, file_path):
+    print(f"Verifying export projects matches {file_path}")
+    resp = requests.get(f"{base_url}/export-projects")
+    print(resp)
+    print(resp.json())
+    assert resp.ok
+    resp_projects = resp.json()
+    with open(os.path.join(ft_resources, file_path), 'r') as fl:
+        file_content = json.load(fl)
+    if matches_level == 'matches':
+        for project in resp_projects['projects']:
+            print(project)
+            assert project['uid'] is not None
+            assert project['creation_datetime'] is not None
+            project['uid'] = None
+            project['creation_datetime'] = None
+        for project in file_content['projects']:
+            print(project)
+            project['uid'] = None
+    comparison_results = compare_things(file_content, resp_projects, verbose=True)
+    print(f"Comparison results: {comparison_results}")
+    for i in comparison_results:
+        print(f"    {i}")
+    print('response projects')
+    print(json.dumps(resp_projects, indent=4))
+    print('file projects')
+    print(json.dumps(file_content, indent=4))
+    assert resp_projects == file_content
 
+@given('I import projects from "{file_path}"')
+def verify_import_matches(context, file_path):
+    print(f"Verifying import projects matches {os.path.join(ft_resources, file_path)}")
+    with open(os.path.join(ft_resources, file_path), 'r') as fl:
+        file_content = json.load(fl)
+    resp = requests.post(f"{base_url}/import-projects", json=file_content)
+    print(resp)
+    print(resp.json())
+    assert resp.ok
 
 # @given('we have behave installed')
 # def step_impl(context):

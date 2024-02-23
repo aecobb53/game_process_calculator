@@ -6,11 +6,12 @@ import requests
 from copy import deepcopy
 from typing import List, Optional, Dict, Union
 
-from handlers import BaseDatabaseInteractor
+# from handlers import BaseDatabaseInteractor
+from handlers import BaseHandler
 from models import Workflow, WorkflowFilter
 
 
-class WorkflowHandler(BaseDatabaseInteractor):
+class WorkflowHandler(BaseHandler):
     save_filename: Optional[str] = None
     _workflows: Optional[List[Workflow]] = None
 
@@ -32,7 +33,7 @@ class WorkflowHandler(BaseDatabaseInteractor):
 
     def load(self) -> None:
         if os.path.exists(self.save_file_path):
-            data = [Workflow.build(p) for p in self.load_file(self.save_file_path)]
+            data = [Workflow.build(w) for w in self.load_file(self.save_file_path)]
         else:
             data = []
         self._workflows = data
@@ -55,13 +56,54 @@ class WorkflowHandler(BaseDatabaseInteractor):
         workflows = workflow_filter.filter_results(workflows)
         return workflows
 
-    def update(self, workflow: Workflow) -> None:
+    def update(self, workflow: Workflow) -> Workflow:
+        workflows = self.filter(WorkflowFilter(uid=[workflow.uid]))
+
+        if len(workflows) == 0:
+            raise IndexError(f"Workflow with uid {workflow.uid} not found")
+        elif len(workflows) > 1:
+            raise IndexError(f"Workflow with uid {workflow.uid} returns multiple results")
+
         updated_workflow = self.filter(workflow_filter=WorkflowFilter(uid=[workflow.uid]))[0]
         updated_workflow.update(workflow)
         self.workflows[updated_workflow.id] = updated_workflow
         self.save()
-        return deepcopy(updated_workflow)
+        return deepcopy(workflow)
 
-    def delete(self, workflow: Workflow) -> None:
-        workflow.deleted = True
-        self.update(workflow=workflow)
+    def delete(self, workflow_uid: int) -> Workflow:
+        workflows = self.filter(WorkflowFilter(uid=[workflow_uid]))
+
+        if len(workflows) == 0:
+            raise IndexError(f"Workflow with uid {workflow_uid} not found")
+        elif len(workflows) > 1:
+            raise IndexError(f"Workflow with uid {workflow_uid} returns multiple results")
+
+        delete_workflow = self.filter(workflow_filter=WorkflowFilter(uid=[workflow_uid]))[0]
+        delete_workflow.delete()
+        self.workflows[delete_workflow.id] = delete_workflow
+        self.save()
+        return deepcopy(delete_workflow)
+
+    def export_workflows(self) -> Dict:
+        workflows = self.filter(WorkflowFilter())
+        return {'workflows': [p.put() for p in workflows]}
+
+    def import_workflows(self, dct) -> List[Workflow]:
+        self._workflows = []
+        workflows = self.workflows
+        output = []
+        print(json.dumps(dct, indent=4))
+        for workflow_dct in dct['workflows']:
+            workflow = Workflow.build(workflow_dct)
+            output.append(workflow)
+            workflows.append(workflow)
+
+        self.save()
+        return output
+
+    def export_google_sheet(self) -> List[str]:
+        workflows = self.filter(WorkflowFilter())
+        output = []
+        for workflow in workflows:
+            output.append(f"{workflow.uid},{workflow.name},=SUM(1,2)")
+        return output
