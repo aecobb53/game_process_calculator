@@ -5,3 +5,11 @@ from .project_handler import ProjectHandler
 from .resource_handler import ResourceHandler
 from .workflow_handler import WorkflowHandler
 from .data_handler import DataHandler
+
+
+class MissingRecord(Exception):
+    pass
+
+
+class DuplicateRecords(Exception):
+    pass

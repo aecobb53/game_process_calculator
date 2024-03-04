@@ -1,0 +1,20 @@
+{
+    "processes": [
+        {
+            "id": 0,
+            "uid": "9dd5580a-6e74-4baa-8ea4-764d1b71271a",
+            "creation_datetime": "2024-02-18T19:46:58.922944Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "active": null,
+            "deleted": false,
+            "name": "Test Process",
+            "project_uid": "b7ae518a-8256-41c1-af94-c74415983c84",
+            "consume_uids": null,
+            "produce_uids": null,
+            "process_time_seconds": null,
+            "rest_time_seconds": null
+        }
+    ]
+}
