@@ -22,6 +22,8 @@ from models import (
 from handlers import ProjectHandler, ResourceHandler, ProcessHandler, WorkflowHandler, DataHandler
 from utils import parse_query_params
 
+from utils import MissingRecordException, DuplicateRecordsException
+
 appname = 'game_process_calculator'
 
 # Logging
@@ -65,7 +67,7 @@ async def root(requests: Request):
 # DEV CLEAR DATA
 @app.post('/clear-test-data')
 async def root(requests: Request):
-    logger.debug('POST on /projects')
+    logger.debug('POST on /clear-test-data')
     if str(os.environ['TESTING']) == '1':
         logger.debug('CLEARING DATA')
         project_handler = ProjectHandler()

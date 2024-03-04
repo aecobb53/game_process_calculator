@@ -1,9 +1,6 @@
-from importlib.resources import Resource
 import json
-from multiprocessing.dummy import Process
 import re
 import os
-from tkinter import W
 import requests
 
 from typing import List, Optional, Dict, Union
@@ -22,6 +19,8 @@ from models import (Project,
     ProcessType,
     WorkflowFilter)
 
+from utils import MissingRecordException, DuplicateRecordsException
+
 
 class DataHandler:
     def __init__(self):
@@ -34,14 +33,14 @@ class DataHandler:
     def validate_project_exists(self, project_uid: str):
         projects = self.project_handler.filter(ProjectFilter())
         if project_uid not in [p.uid for p in projects]:
-            raise ValueError('Project not found')
+            raise MissingRecordException(f'Missing Project [{project_uid}]')
+        return True
 
     # Create
     def create_project(self, project: Project):
         projects = self.project_handler.filter(ProjectFilter())
         if project.name in [p.name for p in projects]:
-            raise ValueError('Project name already exists')
-
+            raise DuplicateRecordsException(f'Project [{project.name}] already exists and must be unique')
         return self.project_handler.create(project)
 
     def create_resource(self, resource: Resource):
@@ -49,18 +48,18 @@ class DataHandler:
 
         resources = self.resource_handler.filter(ResourceFilter(project_uid=[resource.project_uid]))
         if resource.name in [r.name for r in resources]:
-            raise ValueError('Resource name already exists')
+            raise DuplicateRecordsException(f'Resource [{resource.name}] already exists and must be unique')
 
         resource_uids = [r.uid for r in resources]
         if resource.acquisition_uids is not None:
             if not any([uid in resource_uids for uid in resource.acquisition_uids]):
-                raise ValueError('Acquisition Resource not found')
+                raise MissingRecordException(f'Acquisition Resource [{resource.acquisition_uids}] not found')
         if resource.desposal_uids is not None:
             if not any([uid in resource_uids for uid in resource.desposal_uids]):
-                raise ValueError('Desposal Resource not found')
+                raise MissingRecordException(f'Desposal Resource [{resource.desposal_uids}] not found')
         if resource.value_obj_uid is not None:
             if resource.value_obj_uid not in resource_uids:
-                raise ValueError('Value Object Resource not found')
+                raise MissingRecordException(f'Value Resource [{resource.value_obj_uid}] not found')
 
         return self.resource_handler.create(resource)
 
@@ -69,17 +68,17 @@ class DataHandler:
 
         processes = self.process_handler.filter(ProcessFilter(project_uid=[process.project_uid]))
         if process.name in [p.name for p in processes]:
-            raise ValueError('Process name already exists')
+            raise DuplicateRecordsException(f'Process [{process.name}] already exists and must be unique')
 
         resources = self.resource_handler.filter(ResourceFilter(project_uid=[process.project_uid]))
         if process.consume_uids is not None:
             for consume_uid in process.consume_uids:
                 if consume_uid not in [r.uid for r in resources]:
-                    raise ValueError('Consume Resource not found')
+                    raise MissingRecordException(f'Consume Resource [{consume_uid}] not found')
         if process.produce_uids is not None:
             for produce_uid in process.produce_uids:
                 if produce_uid not in [r.uid for r in resources]:
-                    raise ValueError('Produce Resource not found')
+                    raise MissingRecordException(f'Produce Resource [{produce_uid}] not found')
 
         return self.process_handler.create(process)
 
@@ -88,13 +87,13 @@ class DataHandler:
 
         workflows = self.workflow_handler.filter(WorkflowFilter(project_uid=[workflow.project_uid]))
         if workflow.name in [r.name for r in workflows]:
-            raise ValueError('Workflow name already exists')
+            raise DuplicateRecordsException(f'Workflow [{workflow.name}] already exists and must be unique')
 
         processes = self.process_handler.filter(ProcessFilter(project_uid=[workflow.project_uid]))
         if workflow.process_uids is not None:
             for process_uid in workflow.process_uids:
                 if process_uid not in [p.uid for p in processes]:
-                    raise ValueError('Process not found')
+                    raise MissingRecordException(f'Process [{process_uid}] not found')
 
         return self.workflow_handler.create(workflow)
 
@@ -111,32 +110,61 @@ class DataHandler:
     def filter_workflows(self, workflow_filter: WorkflowFilter):
         return self.workflow_handler.filter(workflow_filter)
 
+    # Find
+    def find_project(self, project_uid: str):
+        project_filter = ProjectFilter(uid=[project_uid])
+        projects = self.project_handler.filter(project_filter=project_filter)
+        if len(projects) == 0:
+            raise MissingRecordException(f'Project not found for uid [{project_uid}]')
+        if len(projects) > 1:
+            raise DuplicateRecordsException(f'Too many projects found for uid [{project_uid}]')
+        return projects[0]
+
+    def find_resource(self, resource_uid: str):
+        resource_filter = ResourceFilter(uid=[resource_uid])
+        resources = self.resource_handler.filter(resource_filter=resource_filter)
+        if len(resources) == 0:
+            raise MissingRecordException(f'Resource not found for uid [{resource_uid}]')
+        if len(resources) > 1:
+            raise DuplicateRecordsException(f'Too many resources found for uid [{resource_uid}]')
+        return resources[0]
+
+    def find_process(self, process_uid: str):
+        process_filter = ProcessFilter(uid=[process_uid])
+        processes = self.process_handler.filter(process_filter=process_filter)
+        if len(processes) == 0:
+            raise MissingRecordException(f'Process not found for uid [{process_uid}]')
+        if len(processes) > 1:
+            raise DuplicateRecordsException(f'Too many processes found for uid [{process_uid}]')
+        return processes[0]
+
+    def find_workflow(self, workflow_uid: str):
+        workflow_filter = WorkflowFilter(uid=[workflow_uid])
+        workflows = self.workflow_handler.filter(workflow_filter=workflow_filter)
+        if len(workflows) == 0:
+            raise MissingRecordException(f'Workflow not found for uid [{workflow_uid}]')
+        if len(workflows) > 1:
+            raise DuplicateRecordsException(f'Too many workflows found for uid [{workflow_uid}]')
+        return workflows[0]
+
     # Update
     def update_project(self, project: Project):
-        saved_projects = self.filter_projects(ProjectFilter(uid=[project.uid]))
-        if len(saved_projects) != 1:
-            raise ValueError('Project not found, or too many found. Unable to update')
+        self.find_project(project.uid)  # This may not be needed, but it ensures there is a project with this ID
         self.project_handler.update(project)
         return project
 
     def update_resource(self, resource: Resource):
-        saved_resources = self.filter_resources(ResourceFilter(project_uid=[resource.project_uid], uid=[resource.uid]))
-        if len(saved_resources) != 1:
-            raise ValueError('Resources not found, or too many found. Unable to update')
+        self.find_resource(resource.uid)  # This may not be needed, but it ensures there is a resource with this ID
         self.resource_handler.update(resource)
         return resource
 
     def update_process(self, process: Process):
-        saved_processes = self.filter_processes(ProcessFilter(project_uid=[process.project_uid], uid=[process.uid]))
-        if len(saved_processes) != 1:
-            raise ValueError('Processes not found, or too many found. Unable to update')
+        self.find_process(process.uid)  # This may not be needed, but it ensures there is a process with this ID
         self.process_handler.update(process)
         return process
 
     def update_workflow(self, workflow: Workflow):
-        saved_workflows = self.filter_workflows(WorkflowFilter(project_uid=[workflow.project_uid], uid=[workflow.uid]))
-        if len(saved_workflows) != 1:
-            raise ValueError('Workflows not found, or too many found. Unable to update')
+        self.find_workflow(workflow.uid)  # This may not be needed, but it ensures there is a workflow with this ID
         self.workflow_handler.update(workflow)
         return workflow
 
@@ -153,30 +181,63 @@ class DataHandler:
     def delete_workflow(self, workflow: Workflow):
         return self.workflow_handler.delete(workflow)
 
+    def balance_workflow(self,
+        workflow: Workflow,
+        units_per_second: float = None,
+        speed_modifier: float = 1,
+        productivity_modifier: float = 1):
+        processes = []
+        for process_uid in workflow.process_uids:
+            process = self.filter_processes(ProcessFilter(uid=[process_uid]))
+            assert len(process) == 1  # This needs better error handling
+            process = process[0]
+            consumes_resources = []
+            produces_resources = []
+            if process.consume_uids is not None:
+                for resource_uid in process.consume_uids:
+                    resource = self.filter_resources(ResourceFilter(uid=[resource_uid]))
+                    assert len(resource) == 1  # This needs better error handling
+                    consumes_resources.append(resource[0].put())
+            if process.produce_uids is not None:
+                for resource_uid in process.produce_uids:
+                    resource = self.filter_resources(ResourceFilter(uid=[resource_uid]))
+                    assert len(resource) == 1
+                    produces_resources.append(resource[0].put())
+            process_dict = process.put()
+            process_dict['consumes_resources'] = consumes_resources
+            process_dict['produces_resources'] = produces_resources
+            processes.append(process_dict)
+        return processes
+
     def return_complex_workflow_object(self, workflows: List[Workflow]):
         workflows_dict = []
         for workflow in workflows:
-            processes = []
-            for process_uid in workflow.process_uids:
-                process = self.filter_processes(ProcessFilter(uid=[process_uid]))
-                assert len(process) == 1  # This needs better error handling
-                process = process[0]
-                consumes_resources = []
-                produces_resources = []
-                if process.consume_uids is not None:
-                    for resource_uid in process.consume_uids:
-                        resource = self.filter_resources(ResourceFilter(uid=[resource_uid]))
-                        assert len(resource) == 1  # This needs better error handling
-                        consumes_resources.append(resource[0].put())
-                if process.produce_uids is not None:
-                    for resource_uid in process.produce_uids:
-                        resource = self.filter_resources(ResourceFilter(uid=[resource_uid]))
-                        assert len(resource) == 1
-                        produces_resources.append(resource[0].put())
-                process_dict = process.put()
-                process_dict['consumes_resources'] = consumes_resources
-                process_dict['produces_resources'] = produces_resources
-                processes.append(process_dict)
+            if workflow.process_uids is not None:
+                processes = self.balance_workflow(workflow)
+            else:
+                processes = []
+            # processes = []
+            # if workflow.process_uids is not None:
+            #     for process_uid in workflow.process_uids:
+            #         process = self.filter_processes(ProcessFilter(uid=[process_uid]))
+            #         assert len(process) == 1  # This needs better error handling
+            #         process = process[0]
+            #         consumes_resources = []
+            #         produces_resources = []
+            #         if process.consume_uids is not None:
+            #             for resource_uid in process.consume_uids:
+            #                 resource = self.filter_resources(ResourceFilter(uid=[resource_uid]))
+            #                 assert len(resource) == 1  # This needs better error handling
+            #                 consumes_resources.append(resource[0].put())
+            #         if process.produce_uids is not None:
+            #             for resource_uid in process.produce_uids:
+            #                 resource = self.filter_resources(ResourceFilter(uid=[resource_uid]))
+            #                 assert len(resource) == 1
+            #                 produces_resources.append(resource[0].put())
+            #         process_dict = process.put()
+            #         process_dict['consumes_resources'] = consumes_resources
+            #         process_dict['produces_resources'] = produces_resources
+            #         processes.append(process_dict)
             workflow_dict = workflow.put()
             workflow_dict['processes'] = processes
             workflows_dict.append(workflow_dict)

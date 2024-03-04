@@ -64,9 +64,12 @@ def when_update_project(context, index, name):
     resp = requests.get(f"{base_url}/projects", params=params)
     print(f"Get request for projects code: {resp.status_code}")
     payload = resp.json()['projects'][0]
-    print(f"Modified payload {payload}")
+    print(f"Payload to modify: {payload}")
     payload['name'] = name
+    print(f"Modified payload {payload}")
     resp = requests.put(f"{base_url}/project/{payload['uid']}", json=payload)
+    print(f"PUT response code: {resp.status_code}")
+    print(f"PUT response: {resp.json()}")
     print(resp.ok)
     assert resp.ok
     put_details = resp.json()
@@ -96,6 +99,7 @@ def then_filter_projects(context, name):
 @then('I verify the project at index "{index}" {has_has_not} changed')
 def then_verify_project(context, index, has_has_not):
     index = int(index)
+    print(f"Verifying project at index {index} has changed: {has_has_not}")
     resp = requests.get(f"{base_url}/project/{context.created_projects[index]['uid']}")
     print(resp.ok)
     print(resp.json())

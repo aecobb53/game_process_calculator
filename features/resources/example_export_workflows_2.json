@@ -12,7 +12,8 @@
             "name": "Test Workflow",
             "project_uid": "751be1ac-60c3-4882-9fa9-f5d7ae3c30ec",
             "process_uids": null,
-            "process_type": "LINEAR"
+            "process_type": "LINEAR",
+            "focus_resource_uids": null
         }
     ]
 }

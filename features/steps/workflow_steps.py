@@ -1,5 +1,6 @@
 import os
 import json
+from time import process_time, time
 
 from behave import *
 # import sys
@@ -58,9 +59,9 @@ def capture_workflow_uid(context, name, index):
     else:
         context.tracked_workflow_uids[index] = workflow['uid']
 
-@when('I modify the workflow at index "{index}" name to "{name}"')
-def when_update_workflow(context, index, name):
-    print(f"Modifying workflow at index {index} to name {name}")
+@when('I modify the workflow at index "{index}" "{key}" to "{value}"')
+def when_update_workflow(context, index, key, value):
+    print(f"Modifying workflow at index {index} to {key} {value}")
     params = {
         'uid': context.tracked_workflow_uids[int(index)],
     }
@@ -68,14 +69,16 @@ def when_update_workflow(context, index, name):
     resp = requests.get(f"{base_url}/workflows", params=params)
     print(f"Get request for workflows code: {resp.status_code}")
     payload = resp.json()['workflows'][0]
+    if value.startswith('[') and value.endswith(']'):
+        value = json.loads(value)
+    payload[key] = value
     print(f"Modified payload {payload}")
-    payload['name'] = name
     resp = requests.put(f"{base_url}/workflow/{payload['uid']}", json=payload)
     print(resp.ok)
     assert resp.ok
     put_details = resp.json()
     print(resp.json())
-    assert put_details['name'] == name
+    assert put_details[key] == value
 
 @when('I delete the workflow at index "{index}"')
 def when_delete_workflow(context, index):
@@ -99,6 +102,25 @@ def add_process_to_workflow(context, workflow_index, process_index):
     if workflow['process_uids'] is None:
         workflow['process_uids'] = []
     workflow['process_uids'].append(process['uid'])
+    resp = requests.put(f"{base_url}/workflow/{workflow['uid']}", json=workflow)
+    print(resp.ok)
+    print(resp.json())
+    assert resp.ok
+
+@when('I modify the workflow at index "{workflow_index}" to add resource at index "{resource_index}" as a focus resource')
+def add_focus_resource_to_workflow(context, workflow_index, resource_index):
+    workflow_index = int(workflow_index)
+    resource_index = int(resource_index)
+    print(f"Adding focus resource to workflow")
+    print(f"  Workflow index: {workflow_index}")
+    print(f"  Resource index: {resource_index}")
+    workflow = context.created_workflows[workflow_index]
+    resource = context.created_resources[resource_index]
+    print(f"  Workflow: {workflow}")
+    print(f"  Resource: {resource}")
+    if workflow['focus_resource_uids'] is None:
+        workflow['focus_resource_uids'] = []
+    workflow['focus_resource_uids'].append(resource['uid'])
     resp = requests.put(f"{base_url}/workflow/{workflow['uid']}", json=workflow)
     print(resp.ok)
     print(resp.json())
@@ -185,7 +207,7 @@ def verify_import_matches(context, file_path):
     assert resp.ok
 
 @then('I want to look at the data')
-def when_delete_workflow(context):
+def then_look_at_data(context):
     resp = requests.get(f"{base_url}/visualize-workflows")
     print(resp.ok)
     print(resp.json())
@@ -197,6 +219,40 @@ def when_delete_workflow(context):
         if workflow['process_type'] == 'LINEAR':
             for process in workflow['processes']:
                 print(f"    Process: {process['name']}")
+                process_time = process['process_time_seconds'] or 0
+                rest_time = process['rest_time_seconds'] or 0
+                time_for_process = process_time + rest_time
+                print(f"        Run time: {time_for_process} (s)")
+                for resource in process['consumes_resources']:
+                    amount = process['consume_uids'][resource['uid']]
+                    print(f"        Consumes: {resource['name']}: {amount}")
+                for resource in process['produces_resources']:
+                    amount = process['produce_uids'][resource['uid']]
+                    print(f"        Produces: {resource['name']}: {amount}")
+
+    assert False
+
+@then('I want to look at the data at a balance of "{units_per_second}" units per second')
+def then_look_at_data_with_balance(context, units_per_second):
+    units_per_second = float(units_per_second)
+    params = {
+        'units_per_second': units_per_second
+    }
+    resp = requests.get(f"{base_url}/visualize-workflows", params=params)
+    print(resp.ok)
+    print(resp.json())
+    assert resp.ok
+    print(json.dumps(resp.json(), indent=4))
+    workflows = resp.json()['workflows']
+    for workflow in workflows:
+        print(f"Workflow: {workflow['name']}")
+        if workflow['process_type'] == 'LINEAR':
+            for process in workflow['processes']:
+                print(f"    Process: {process['name']}")
+                process_time = process['process_time_seconds'] or 0
+                rest_time = process['rest_time_seconds'] or 0
+                time_for_process = process_time + rest_time
+                print(f"        Run time: {time_for_process} (s)")
                 for resource in process['consumes_resources']:
                     amount = process['consume_uids'][resource['uid']]
                     print(f"        Consumes: {resource['name']}: {amount}")

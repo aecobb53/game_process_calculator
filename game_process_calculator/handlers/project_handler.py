@@ -59,6 +59,7 @@ class ProjectHandler(BaseHandler):
 
     def update(self, project: Project) -> Project:
         projects = self.filter(ProjectFilter(uid=[project.uid]))
+        print(f'IN PROJECT UPDATE FUNCTION')
 
         if len(projects) == 0:
             raise IndexError(f"Project with uid {project.uid} not found")
@@ -66,6 +67,8 @@ class ProjectHandler(BaseHandler):
             raise IndexError(f"Project with uid {project.uid} returns multiple results")
 
         updated_project = self.filter(project_filter=ProjectFilter(uid=[project.uid]))[0]
+        print(project)
+        print(updated_project)
         updated_project.update(project)
         self.projects[updated_project.id] = updated_project
         self.save()

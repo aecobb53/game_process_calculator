@@ -111,6 +111,23 @@ def add_resource_to_process(context, process_index, consume_or_produce, resource
     print(resp.json())
     assert resp.ok
 
+@when('I modify the process id at index "{process_index}" to have a "{process_or_rest}" time of "{time_s}"')
+def add_process_time(context, process_index, process_or_rest, time_s):
+    process_index = int(process_index)
+    time_s = float(time_s)
+    print(f"Adding {process_or_rest} time to process")
+    print(f"  Process index: {process_index}")
+    print(f"  Time: {time_s}")
+    process = context.created_processes[process_index]
+    if process_or_rest == 'process':
+        process['process_time_seconds'] = time_s
+    elif process_or_rest == 'rest':
+        process['rest_time_seconds'] = time_s
+    resp = requests.put(f"{base_url}/process/{process['uid']}", json=process)
+    print(resp.ok)
+    print(resp.json())
+    assert resp.ok
+
 @when('I delete the process at index "{index}"')
 def when_delete_resource(context, index):
     index = int(index)

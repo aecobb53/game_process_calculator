@@ -36,6 +36,7 @@ Feature: Factorio
          When I modify the process id at index "3" to "consume" resource at index "2" in quantity "1"
          When I modify the process id at index "3" to "consume" resource at index "0" in quantity "1"
          When I modify the process id at index "3" to "produce" resource at index "5" in quantity "2"
+         When I modify the process id at index "3" to have a "process" time of "0.5"
 
         Given I create a process with the name "Inserter" in the project named "Factorio"
          When I capture the process id for "Inserter" and save it to index "next"
@@ -43,12 +44,40 @@ Feature: Factorio
          When I modify the process id at index "4" to "consume" resource at index "2" in quantity "1"
          When I modify the process id at index "4" to "consume" resource at index "0" in quantity "1"
          When I modify the process id at index "4" to "produce" resource at index "6" in quantity "1"
+         When I modify the process id at index "4" to have a "process" time of "0.5"
 
         Given I create a process with the name "Green Science Pack" in the project named "Factorio"
          When I capture the process id for "Green Science Pack" and save it to index "next"
          When I modify the process id at index "5" to "consume" resource at index "6" in quantity "1"
          When I modify the process id at index "5" to "consume" resource at index "5" in quantity "1"
          When I modify the process id at index "5" to "produce" resource at index "7" in quantity "1"
+         When I modify the process id at index "5" to have a "process" time of "6"
+
+        Given I create a workflow with the name "Green Science Pack" in the project named "Factorio" with the process_type of "LINEAR"
+         When I capture the workflow id for "Green Science Pack" and save it to index "next"
+         When I modify the workflow at index "0" "description" to "Does not go down to raw resource level"
+         When I modify the workflow at index "0" to add resource at index "5" as a focus resource
+
+         When I modify the workflow id at index "0" to include process at index "3"
+         When I modify the workflow id at index "0" to include process at index "4"
+         When I modify the workflow id at index "0" to include process at index "5"
+
+        #  Then I want to look at the data
+        #  Then I want to look at the data at a balance of "0.6" units per second
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         #  Then I verify the projects export "exactly matches" "Example_Factorio/project_export_1.json"
         #  Then I verify the projects export "exactly matches" "example_export_projects_2.json"
@@ -66,6 +95,7 @@ Feature: Factorio
     # Scenario: Transport Belt
     # Scenario: Red Science Pack
     # Scenario: Green Science Pack
+    # Scenario: Building out Factorio
 
 
 
