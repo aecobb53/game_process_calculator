@@ -20,9 +20,8 @@ from models import (
     WorkflowFilter,
     ProcessType)
 from handlers import ProjectHandler, ResourceHandler, ProcessHandler, WorkflowHandler, DataHandler
-from utils import parse_query_params
-
-from utils import MissingRecordException, DuplicateRecordsException
+from utils import parse_query_params, MissingRecordException, DuplicateRecordsException
+from html import WorkflowDisplay
 
 appname = 'game_process_calculator'
 
@@ -377,143 +376,27 @@ async def visualize_workflows(request: Request):
     workflows_dict = data_handler.return_complex_workflow_object(workflows=workflows)
     return {'workflows': workflows_dict}
 
+@app.get('/html/visualize-workflows')
+async def visualize_workflow_html(request: Request):
+    logger.debug('GET on /html/visualize-workflows')
+    workflow_filter = parse_query_params(request=request, query_class=WorkflowFilter)
+    data_handler = DataHandler()
+    workflows = data_handler.filter_workflows(workflow_filter=workflow_filter)
+    workflows_dict = data_handler.return_complex_workflow_object(workflows=workflows)
+    workflow_doc = WorkflowDisplay(workflows_dict=workflows_dict)
+    workflow_html = workflow_doc.display_workflow()
+    with open(os.path.join('deleteme_html_files', 'workflow.html'), 'w') as f:
+        f.write(workflow_html)
+    return HTMLResponse(content=workflow_html, status_code=200)
 
-
-
-
-
-
-# # @app.get('/main-page', response_class=HTMLResponse)
-# # async def current_builds(requests: Request):
-# #     with open('templates/main_page.html', 'r') as hf:
-# #         html_content = hf.read()
-# #     return HTMLResponse(content=html_content, status_code=200)
-
-# # @app.get('/test-get', resource_class=HTMLResponse)
-# # async def test_get_endpoint(requests: Request):
-# #     return HTMLResponse(status_code=200)
-
-# # @app.get('/test-get-data', resource_class=HTMLResponse)
-# # async def test_get_endpoint(requests: Request):
-# #     data = {
-# #         'results': [
-# #             {}
-# #         ]
-# #     }
-# #     return HTMLResponse(status_code=200)
-
-# # @app.post('/test-post', resource_class=HTMLResponse)
-# # async def test_post_endpoint(requests: Request):
-# #     return HTMLResponse(status_code=200)
-
-# # @app.put('/test-put', resource_class=HTMLResponse)
-# # async def test_put_endpoint(requests: Request):
-# #     return HTMLResponse(status_code=200)
-
-# @app.get('/ifsc-data')
-# async def ifsc_current_rankings_data(requests: Request):
-#     logger.debug('GET on /ifsc-data')
-#     data = search_ifsc_data()
-#     content = {
-#         "data": data
-#     }
-#     return content
-
-
-# @app.get('/timecard')
-# async def timecard_get(requests: Request, day: str = None):
-#     logger.debug(f'day: {day}')
-#     logger.debug('GET on /timecard')
-#     tc = Timecard()
-#     return tc.display_data(day=day)
-
-
-# @app.get('/html/timecard')
-# async def timecard_get(requests: Request):
-#     logger.debug('GET on /html/timecard')
-#     with open('templates/get_timecard_chargecodes.html', 'r') as hf:
-#         html_content = hf.read()
-#     return HTMLResponse(content=html_content, status_code=200)
-
-
-# @app.put('/timecard')
-# async def timecard_put(requests: Request, timecard_data: PUTTimecard):
-#     logger.debug('PUT on /timecard')
-#     logger.debug(f"timecard_data: {timecard_data}")
-#     tc = Timecard()
-#     tc.save(data=timecard_data)
-#     return tc.data
-
-
-# @app.post('/timecard-set')
-# async def timecard_post(requests: Request, timecard_data: PUTTimecard):
-#     logger.debug('POST on /timecard-set')
-#     try:
-#         tc = Timecard()
-#         tc.save(data=timecard_data.put)
-#         logger.debug(f"Database overwritten")
-#     except Exception as err:
-#         logger.error(f"Internal Exception raised: {err}")
-#         return {'message': f"Internal Exception raised: {err}"}
-#     return tc.data
-
-
-# @app.post('/timecard-entry')
-# async def timecard_post(requests: Request, timecard_entry: POSTTimecardEntry):
-#     logger.debug('POST on /timecard-entry')
-#     try:
-#         tc = Timecard()
-#         entry = timecard_entry.return_timecard_entry()
-#         entry.validate_im_good()
-#         tc.add_entry(entry=entry)
-#         tc.save()
-#     except ValueError as err:
-#         logger.warning(f"{err}")
-#         raise HTTPException(status_code=500, detail=f"{err}")
-#     except Exception as err:
-#         logger.warning(f"{err}")
-#         raise HTTPException(status_code=500, detail=f"{err}")
-#     return entry.put
-
-# @app.put('/timecard-entry/{entry_id}')
-# async def timecard_put(requests: Request, entry_id: str, timecard_entry: POSTTimecardEntry):
-#     logger.debug('PUT on /timecard-entry')
-#     try:
-#         tc = Timecard()
-#         entry = timecard_entry.return_timecard_entry()
-#         entry.validate_im_good()
-#         tc.update_entry(entry_id=entry_id, updated_entry=entry)
-#         tc.save()
-#     except ValueError as err:
-#         logger.warning(f"{err}")
-#         raise HTTPException(status_code=500, detail=f"{err}")
-#     except Exception as err:
-#         logger.warning(f"{err}")
-#         raise HTTPException(status_code=500, detail=f"{err}")
-#     return entry.put
-
-# @app.get('/html/timecard-entry')
-# async def timecard_get(requests: Request):
-#     logger.debug('GET on /html/timecard-entry')
-#     with open('templates/post_timecard_entry.html', 'r') as hf:
-#         html_content = hf.read()
-#     return HTMLResponse(content=html_content, status_code=200)
-
-# @app.get('/charge-codes')
-# async def timecard_get(requests: Request):
-#     logger.debug('GET on /charge-codes')
-#     charge_code_dict = {k: getattr(ShorthandMapping, k).value for k in [ShorthandMapping(e).name for e in ShorthandMapping]}
-#     return charge_code_dict
-
-# # Task Service
-# @app.post('/task-service')
-# async def task_service_post(requests: Request, task_service_payload: TaskServicePayload):
-#     logger.debug('POST on /task-service')
-#     save_task_service_payload(content=task_service_payload, logit=logger)
-#     return {'status': 'Saved'}
-
-# @app.get('/task-service')
-# async def task_service_get(requests: Request):
-#     logger.debug('GET on /task-service')
-#     obj = load_task_service_payload(logit=logger)
-#     return obj.put()
+# @app.get('/html/visualize-workflows/{workflow_uid}')
+# async def visualize_workflow_html(workflow_uid: str = None):
+#     logger.debug('GET on /html/visualize-workflows')
+#     data_handler = DataHandler()
+#     workflow = data_handler.find_workflow(workflow_uid=workflow_uid)
+#     workflows_dict = data_handler.return_complex_workflow_object(workflows=workflows)
+#     workflow_doc = WorkflowDisplay(workflows_dict=workflows_dict)
+#     workflow_html = workflow_doc.display_workflow()
+#     with open(os.path.join('deleteme_html_files', 'workflow.html'), 'w') as f:
+#         f.write(workflow_html)
+#     return HTMLResponse(content=workflow_html, status_code=200)

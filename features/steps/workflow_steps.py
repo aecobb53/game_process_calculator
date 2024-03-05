@@ -262,6 +262,26 @@ def then_look_at_data_with_balance(context, units_per_second):
 
     assert False
 
+@then('I visualize workflow at index "{index}" with html')
+def then_visualize_with_html(context, index):
+    index = int(index)
+    print('')
+    print('')
+    print('')
+    print('VISUALIZING WORKFLOW WITH HTML')
+    print(f"  Workflow index: {index}")
+    # workflow = context.created_workflows[index]
+    # print(f"  Workflow: {workflow}")
+    # if workflow['focus_resource_uids'] is None:
+    #     workflow['focus_resource_uids'] = []
+    # resp = requests.get(f"{base_url}/html/visualize-workflows/{workflow['uid']}")
+    resp = requests.get(f"{base_url}/html/visualize-workflows")
+    print(resp.ok)
+    print(resp.text)
+    assert resp.ok
+    assert resp.text is not None
+    assert False
+
 # # # @given('we have behave installed')
 # # # def step_impl(context):
 # # #     pass

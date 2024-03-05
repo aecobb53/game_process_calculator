@@ -162,3 +162,4 @@ cython_debug/
 # Local
 data/*
 test/test_data/*
+deleteme_html_files/*

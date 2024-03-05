@@ -17,6 +17,7 @@ class Process(BaseDBObj):
     project_uid: str
     consume_uids: Optional[Dict[str, float]] = None  # Resource UID
     produce_uids: Optional[Dict[str, float]] = None  # Resource UID
+    machine_uids: Optional[str] = None  # Machine UID
     process_time_seconds: Optional[float] = None
     rest_time_seconds: Optional[float] = None
 
@@ -32,6 +33,7 @@ class Process(BaseDBObj):
             'project_uid': dct.get('project_uid'),
             'consume_uids': dct.get('consume_uids'),
             'produce_uids': dct.get('produce_uids'),
+            'machine_uids': dct.get('machine_uids'),
             'process_time_seconds': dct.get('process_time_seconds'),
             'rest_time_seconds': dct.get('rest_time_seconds'),
         })
@@ -46,6 +48,7 @@ class Process(BaseDBObj):
             'project_uid': self.project_uid,
             'consume_uids': self.consume_uids,
             'produce_uids': self.produce_uids,
+            'machine_uids': self.machine_uids,
             'process_time_seconds': self.process_time_seconds,
             'rest_time_seconds': self.rest_time_seconds,
         })
@@ -56,6 +59,7 @@ class Process(BaseDBObj):
         self.name = project.name
         self.consume_uids = project.consume_uids
         self.produce_uids = project.produce_uids
+        self.machine_uids = project.machine_uids
         self.process_time_seconds = project.process_time_seconds
         self.rest_time_seconds = project.rest_time_seconds
 
@@ -64,6 +68,7 @@ class ProcessFilter(BaseDBObjFilter):
     project_uid: Optional[List[str]] = None
     consume_uids: Optional[List[str]] = None
     produce_uids: Optional[List[str]] = None
+    machine_uids: Optional[List[str]] = None
     value_obj_uid: Optional[str] = None
 
     def filter_results(self, results: List[Process]):
@@ -85,6 +90,11 @@ class ProcessFilter(BaseDBObjFilter):
                 if result.produce_uids is None:
                     continue
                 if not any([uid in self.produce_uids for uid in result.produce_uids]):
+                    continue
+            if self.machine_uids is not None:
+                if result.machine_uids is None:
+                    continue
+                if self.machine_uids != result.machine_uids:
                     continue
             if self.value_obj_uid is not None:
                 if result.value_obj_uid is None:

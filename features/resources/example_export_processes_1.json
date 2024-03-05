@@ -13,6 +13,7 @@
             "project_uid": "b7ae518a-8256-41c1-af94-c74415983c84",
             "consume_uids": null,
             "produce_uids": null,
+            "machine_uids": null,
             "process_time_seconds": null,
             "rest_time_seconds": null
         }

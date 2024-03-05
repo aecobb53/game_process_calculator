@@ -206,6 +206,8 @@ class DataHandler:
             process_dict = process.put()
             process_dict['consumes_resources'] = consumes_resources
             process_dict['produces_resources'] = produces_resources
+            process_dict['machine_used'] = 'N/A'  # Fix this eventually
+            process_dict['machine_count'] = 1  # Fix this eventually
             processes.append(process_dict)
         return processes
 
