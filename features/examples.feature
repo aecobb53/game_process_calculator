@@ -56,7 +56,7 @@ Feature: Factorio
         Given I create a workflow with the name "Green Science Pack" in the project named "Factorio" with the process_type of "LINEAR"
          When I capture the workflow id for "Green Science Pack" and save it to index "next"
          When I modify the workflow at index "0" "description" to "Does not go down to raw resource level"
-         When I modify the workflow at index "0" to add resource at index "5" as a focus resource
+         When I modify the workflow at index "0" to add resource at index "7" as a focus resource
 
          When I modify the workflow id at index "0" to include process at index "3"
          When I modify the workflow id at index "0" to include process at index "4"
@@ -65,7 +65,7 @@ Feature: Factorio
         #  Then I want to look at the data
         #  Then I want to look at the data at a balance of "0.6" units per second
 
-         Then I visualize workflow at index "0" with html
+         Then I visualize workflow at index "0" with html and a units per second of "1"
 
 
 

@@ -17,7 +17,8 @@ from models import (Project,
     ProcessFilter,
     Workflow,
     ProcessType,
-    WorkflowFilter)
+    WorkflowFilter,
+    BalanceWorkflowArgs)
 
 from utils import MissingRecordException, DuplicateRecordsException
 
@@ -181,68 +182,98 @@ class DataHandler:
     def delete_workflow(self, workflow: Workflow):
         return self.workflow_handler.delete(workflow)
 
+    def calculate_workflow_resources(self, workflow_processes):
+        """
+        Given a series of processes, what are the resulting resources flows
+        """
+        workflow_resources = {}
+        for _, process_details in workflow_processes.items():
+            for resource_uid, resource_amount in process_details['consumes_resources'].items():
+                resource = self.find_resource(resource_uid=resource_uid)
+                if resource_uid not in workflow_resources:
+                    workflow_resources[resource_uid] = {
+                        "name": self.find_resource(resource_uid=resource_uid).name,  # Just for now
+                        "resource_metadata": resource.put(),
+                        "consumed_per_second": 0,
+                        "produced_per_second": 0,
+                    }
+                workflow_resources[resource_uid]['consumed_per_second'] += resource_amount / process_details['process_time_seconds'] * process_details['process_count']
+            for resource_uid, resource_amount in process_details['produces_resources'].items():
+                resource = self.find_resource(resource_uid=resource_uid)
+                if resource_uid not in workflow_resources:
+                    workflow_resources[resource_uid] = {
+                        "name": self.find_resource(resource_uid=resource_uid).name,  # Just for now
+                        "resource_metadata": resource.put(),
+                        "consumed_per_second": 0,
+                        "produced_per_second": 0,
+                    }
+                workflow_resources[resource_uid]['produced_per_second'] += resource_amount / process_details['process_time_seconds'] * process_details['process_count']
+        return workflow_resources
+
+    def adjust_workflow_processes(self, workflow, workflow_processes, workflow_resources, balance_criteria):
+        """
+        Given a series of resources, adjust the processes to meet the balance criteria
+        """
+        adjusted = False
+        for resource_uid, resource_data in workflow_resources.items():
+            if resource_uid in workflow.focus_resource_uids:
+                net_production = resource_data['produced_per_second'] - resource_data['consumed_per_second']
+                if net_production < balance_criteria.extract_units_per_second:
+                    for process_uid, processes_dict in workflow_processes.items():
+                        if resource_uid in processes_dict['produces_resources']:
+                            adjustment = balance_criteria.extract_units_per_second / (
+                                processes_dict['produces_resources'][resource_uid] / processes_dict['process_time_seconds']
+                            )
+                            workflow_processes[process_uid]['process_count'] = adjustment
+                            adjusted = True
+        return adjusted, workflow_processes
+
     def balance_workflow(self,
         workflow: Workflow,
-        units_per_second: float = None,
+        balance_criteria: BalanceWorkflowArgs = None,
         speed_modifier: float = 1,
         productivity_modifier: float = 1):
-        processes = []
+        # TODO: Move speed modifier and productivity modifier into the process and apply upon balance
+        """
+        Create a dict of processes to alter increase the count of processes needed
+        """
+        workflow_processes = {}
         for process_uid in workflow.process_uids:
-            process = self.filter_processes(ProcessFilter(uid=[process_uid]))
-            assert len(process) == 1  # This needs better error handling
-            process = process[0]
-            consumes_resources = []
-            produces_resources = []
-            if process.consume_uids is not None:
-                for resource_uid in process.consume_uids:
-                    resource = self.filter_resources(ResourceFilter(uid=[resource_uid]))
-                    assert len(resource) == 1  # This needs better error handling
-                    consumes_resources.append(resource[0].put())
-            if process.produce_uids is not None:
-                for resource_uid in process.produce_uids:
-                    resource = self.filter_resources(ResourceFilter(uid=[resource_uid]))
-                    assert len(resource) == 1
-                    produces_resources.append(resource[0].put())
-            process_dict = process.put()
-            process_dict['consumes_resources'] = consumes_resources
-            process_dict['produces_resources'] = produces_resources
-            process_dict['machine_used'] = 'N/A'  # Fix this eventually
-            process_dict['machine_count'] = 1  # Fix this eventually
-            processes.append(process_dict)
-        return processes
+            process = self.find_process(process_uid=process_uid)
+            process_dict = {
+                "name": process.name,  # Just for now
+                "process_metadata": process.put(),
+                "machine_used": 'N/A',  # TODO: Add machine used
+                "process_count": 1,
+                "process_time_seconds": process.process_time,
+                "consumes_resources": {},
+                "produces_resources": {},
+            }
+            for resource_uid, resource_amount in process.consume_uids.items():
+                if resource_uid not in process_dict['consumes_resources']:
+                    process_dict['consumes_resources'][resource_uid] = resource_amount
+            for resource_uid, resource_amount in process.produce_uids.items():
+                if resource_uid not in process_dict['produces_resources']:
+                    process_dict['produces_resources'][resource_uid] = resource_amount
+            workflow_processes[process_uid] = process_dict
 
-    def return_complex_workflow_object(self, workflows: List[Workflow]):
+        workflow_resources = self.calculate_workflow_resources(workflow_processes=workflow_processes)
+        _, workflow_processes = self.adjust_workflow_processes(workflow=workflow, workflow_processes=workflow_processes, workflow_resources=workflow_resources, balance_criteria=balance_criteria)
+        workflow_resources = self.calculate_workflow_resources(workflow_processes=workflow_processes)
+        return workflow_processes
+
+    def return_complex_workflow_object(self, workflows: List[Workflow], balance_criteria: BalanceWorkflowArgs = None):
         workflows_dict = []
         for workflow in workflows:
             if workflow.process_uids is not None:
-                processes = self.balance_workflow(workflow)
+                processes_dict = self.balance_workflow(workflow, balance_criteria=balance_criteria)
             else:
-                processes = []
-            # processes = []
-            # if workflow.process_uids is not None:
-            #     for process_uid in workflow.process_uids:
-            #         process = self.filter_processes(ProcessFilter(uid=[process_uid]))
-            #         assert len(process) == 1  # This needs better error handling
-            #         process = process[0]
-            #         consumes_resources = []
-            #         produces_resources = []
-            #         if process.consume_uids is not None:
-            #             for resource_uid in process.consume_uids:
-            #                 resource = self.filter_resources(ResourceFilter(uid=[resource_uid]))
-            #                 assert len(resource) == 1  # This needs better error handling
-            #                 consumes_resources.append(resource[0].put())
-            #         if process.produce_uids is not None:
-            #             for resource_uid in process.produce_uids:
-            #                 resource = self.filter_resources(ResourceFilter(uid=[resource_uid]))
-            #                 assert len(resource) == 1
-            #                 produces_resources.append(resource[0].put())
-            #         process_dict = process.put()
-            #         process_dict['consumes_resources'] = consumes_resources
-            #         process_dict['produces_resources'] = produces_resources
-            #         processes.append(process_dict)
+                processes_dict = None
             workflow_dict = workflow.put()
-            workflow_dict['processes'] = processes
+            workflow_dict['processes_dict'] = processes_dict
             workflows_dict.append(workflow_dict)
+        with open('DELETEME_IM_NOT_NEEDED.json', 'w') as jf:
+            jf.write(json.dumps(workflows_dict, indent=4))
         return workflows_dict
 
 

@@ -262,8 +262,8 @@ def then_look_at_data_with_balance(context, units_per_second):
 
     assert False
 
-@then('I visualize workflow at index "{index}" with html')
-def then_visualize_with_html(context, index):
+@then('I visualize workflow at index "{index}" with html and a units per second of "{units_per_second}"')
+def then_visualize_with_html(context, index, units_per_second):
     index = int(index)
     print('')
     print('')
@@ -275,7 +275,14 @@ def then_visualize_with_html(context, index):
     # if workflow['focus_resource_uids'] is None:
     #     workflow['focus_resource_uids'] = []
     # resp = requests.get(f"{base_url}/html/visualize-workflows/{workflow['uid']}")
-    resp = requests.get(f"{base_url}/html/visualize-workflows")
+    if units_per_second is not None and units_per_second != 'None':
+        units_per_second = float(units_per_second)
+        params = {
+            'units_per_second': units_per_second
+        }
+        resp = requests.get(f"{base_url}/html/visualize-workflows", params=params)
+    else:
+        resp = requests.get(f"{base_url}/html/visualize-workflows")
     print(resp.ok)
     print(resp.text)
     assert resp.ok

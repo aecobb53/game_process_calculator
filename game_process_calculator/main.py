@@ -18,7 +18,8 @@ from models import (
     ResourceFilter,
     Workflow,
     WorkflowFilter,
-    ProcessType)
+    ProcessType,
+    BalanceWorkflowArgs)
 from handlers import ProjectHandler, ResourceHandler, ProcessHandler, WorkflowHandler, DataHandler
 from utils import parse_query_params, MissingRecordException, DuplicateRecordsException
 from html import WorkflowDisplay
@@ -380,9 +381,12 @@ async def visualize_workflows(request: Request):
 async def visualize_workflow_html(request: Request):
     logger.debug('GET on /html/visualize-workflows')
     workflow_filter = parse_query_params(request=request, query_class=WorkflowFilter)
+    balance_params = parse_query_params(request=request, query_class=BalanceWorkflowArgs)
     data_handler = DataHandler()
     workflows = data_handler.filter_workflows(workflow_filter=workflow_filter)
-    workflows_dict = data_handler.return_complex_workflow_object(workflows=workflows)
+    workflows_dict = data_handler.return_complex_workflow_object(
+        workflows=workflows,
+        balance_criteria=balance_params)
     workflow_doc = WorkflowDisplay(workflows_dict=workflows_dict)
     workflow_html = workflow_doc.display_workflow()
     with open(os.path.join('deleteme_html_files', 'workflow.html'), 'w') as f:

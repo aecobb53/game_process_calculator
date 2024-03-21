@@ -24,6 +24,12 @@ class Process(BaseDBObj):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    @property
+    def process_time(self):
+        time = self.process_time_seconds or 0
+        time += self.rest_time_seconds or 0
+        return time
+
     @classmethod
     def build(cls, dct):
         utils = Utils()
