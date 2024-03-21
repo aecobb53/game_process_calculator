@@ -20,7 +20,7 @@ from models import (Project,
     WorkflowFilter,
     BalanceWorkflowArgs)
 
-from utils import MissingRecordException, DuplicateRecordsException
+from utils import MissingRecordException, DuplicateRecordsException, Utils
 
 
 class DataHandler:
@@ -29,6 +29,7 @@ class DataHandler:
         self.resource_handler = ResourceHandler()
         self.process_handler = ProcessHandler()
         self.workflow_handler = WorkflowHandler()
+        self.utils = Utils()
 
     # Validate
     def validate_project_exists(self, project_uid: str):
@@ -214,6 +215,7 @@ class DataHandler:
         """
         Given a series of resources, adjust the processes to meet the balance criteria
         """
+        print('ADJUSTING WORKFLOW PROCESSES')
         adjusted = False
         for resource_uid, resource_data in workflow_resources.items():
             if resource_uid in workflow.focus_resource_uids:
@@ -226,6 +228,24 @@ class DataHandler:
                             )
                             workflow_processes[process_uid]['process_count'] = adjustment
                             adjusted = True
+        if not adjusted:
+            for resource_uid, resource_data in workflow_resources.items():
+                if resource_data['consumed_per_second'] > 0 and resource_data['produced_per_second'] > 0:
+                    print(resource_uid)
+                    print(json.dumps(resource_data, indent=2))
+                    if resource_data['produced_per_second'] < resource_data['consumed_per_second']:
+                        print('NEED TO ADJUST')
+                        for process_uid, processes_dict in workflow_processes.items():
+                            if resource_uid in processes_dict['produces_resources']:
+                                print(f"FOUND FOR ADJUSTMENT: {process_uid}")
+                                print(json.dumps(processes_dict, indent=2))
+                                adjustment = (resource_data['consumed_per_second'] - resource_data['produced_per_second']) / (
+                                    processes_dict['produces_resources'][resource_uid] / processes_dict['process_time_seconds']
+                                )
+                                adjustment = self.utils.round_up(number=adjustment)
+                                print(f"Adjustment: {adjustment}")
+                                workflow_processes[process_uid]['process_count'] += adjustment
+                                adjusted = True
         return adjusted, workflow_processes
 
     def balance_workflow(self,
@@ -260,20 +280,41 @@ class DataHandler:
         workflow_resources = self.calculate_workflow_resources(workflow_processes=workflow_processes)
         _, workflow_processes = self.adjust_workflow_processes(workflow=workflow, workflow_processes=workflow_processes, workflow_resources=workflow_resources, balance_criteria=balance_criteria)
         workflow_resources = self.calculate_workflow_resources(workflow_processes=workflow_processes)
-        return workflow_processes
+        
+        
+        _, workflow_processes = self.adjust_workflow_processes(workflow=workflow, workflow_processes=workflow_processes, workflow_resources=workflow_resources, balance_criteria=balance_criteria)
+        workflow_resources = self.calculate_workflow_resources(workflow_processes=workflow_processes)
+        
+        
+        return workflow_processes, workflow_resources
 
     def return_complex_workflow_object(self, workflows: List[Workflow], balance_criteria: BalanceWorkflowArgs = None):
         workflows_dict = []
         for workflow in workflows:
             if workflow.process_uids is not None:
-                processes_dict = self.balance_workflow(workflow, balance_criteria=balance_criteria)
+                processes_dict, resources_dict = self.balance_workflow(workflow, balance_criteria=balance_criteria)
             else:
                 processes_dict = None
+                resources_dict = None
             workflow_dict = workflow.put()
             workflow_dict['processes_dict'] = processes_dict
+            workflow_dict['resources_dict'] = resources_dict
             workflows_dict.append(workflow_dict)
+
+
+
         with open('DELETEME_IM_NOT_NEEDED.json', 'w') as jf:
             jf.write(json.dumps(workflows_dict, indent=4))
+        for resource_uid, resource_data in resources_dict.items():
+            print('')
+            print(resource_data['name'])
+            print(resource_data['consumed_per_second'], resource_data['produced_per_second'])
+            net = resource_data['produced_per_second'] - resource_data['consumed_per_second']
+            print(f"Net: {net}")
+
+
+
+
         return workflows_dict
 
 

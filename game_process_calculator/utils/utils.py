@@ -293,6 +293,15 @@ class Utils:
             return None
         return self._super_strip(item_str)
 
+    def round_up(self, number, decimal_places=0):
+        number = float(number)
+        decimal_offset = int(f"1{'0' * decimal_places}")
+        shift_number = int(number * decimal_offset)
+        if shift_number < (number * decimal_offset):
+            shift_number += 1
+        unshift_number = shift_number / decimal_offset
+        return float(unshift_number)
+
 
 # list_of_headers = [
 #     '### tip-order',

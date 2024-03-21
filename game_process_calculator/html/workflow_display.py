@@ -83,6 +83,8 @@ class WorkflowDisplay:
             style_obj=Style(style_details={'border': '3px solid red'}))
         detailed_breakdown_div = Div().add_style(
             style_obj=Style(style_details={'border': '3px solid blue'}))
+        resource_balance_div = Div().add_style(
+            style_obj=Style(style_details={'border': '3px solid blue'}))
 
         # return data_div
 
@@ -236,6 +238,30 @@ class WorkflowDisplay:
 
         detailed_breakdown_div.add_element(detailed_breakdwon_table)
         data_div.add_element(detailed_breakdown_div)
+
+        # Resource balance
+        resource_balance = Table()
+        headers = ['Resource', 'Consumed (U/s)', 'Produced (U/s)', 'NET (U/s)']
+        resource_balance_header_row = TableRow()
+        for header in headers:
+            resource_balance_header_row.add_element(TableHeader(header).add_style(style_obj=self.table_header_style))
+        resource_balance.add_element(resource_balance_header_row)
+
+        for resource_uid, resource_balance_dict in workflow_dict['resources_dict'].items():
+            resource = self.data_handler.find_resource(resource_uid)
+            table_row = TableRow()
+            table_row.add_element(TableData(internal=resource.name))
+            consumed_per_second = resource_balance_dict['consumed_per_second']
+            produced_per_second = resource_balance_dict['produced_per_second']
+            net_per_second = produced_per_second - consumed_per_second
+            table_row.add_element(TableData(internal=consumed_per_second))
+            table_row.add_element(TableData(internal=produced_per_second))
+            table_row.add_element(TableData(internal=net_per_second))
+            for item in table_row.internal:
+                item.add_style(style_obj=self.table_data_style)
+            resource_balance.add_element(table_row)
+        resource_balance_div.add_element(resource_balance)
+        data_div.add_element(resource_balance_div)
 
         return data_div
 
