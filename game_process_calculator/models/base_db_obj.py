@@ -19,6 +19,7 @@ class BaseDBObj(BaseModel):
     update_datetime: Optional[datetime] = None
     description: Optional[str] = None
     notes: Optional[List[str]] = None
+    metadata: Optional[Dict] = None
     active: Optional[bool] = None
     deleted: Optional[bool] = False
 
@@ -73,6 +74,7 @@ class BaseDBObj(BaseModel):
             'update_datetime': utils.time_str_to_obj(dct.get('update_datetime'), allow_none=True),
             'description': dct.get('description'),
             'notes': dct.get('notes'),
+            'metadata': dct.get('metadata'),
             'active': dct.get('active'),
             'deleted': dct.get('deleted'),
         }
@@ -87,6 +89,7 @@ class BaseDBObj(BaseModel):
             'update_datetime': utils.time_obj_to_str(self.update_datetime, allow_none=True),
             'description': self.description,
             'notes': self.notes,
+            'metadata': self.metadata,
             'active': self.active,
             'deleted': self.deleted,
         }
@@ -98,6 +101,7 @@ class BaseDBObj(BaseModel):
         self.name = obj.name
         self.active = obj.active
         self.deleted = obj.deleted
+        self.metadata = obj.metadata
 
         self.update_datetime = datetime.utcnow()
 

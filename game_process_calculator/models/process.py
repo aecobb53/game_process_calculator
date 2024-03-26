@@ -17,9 +17,11 @@ class Process(BaseDBObj):
     project_uid: str
     consume_uids: Optional[Dict[str, float]] = None  # Resource UID
     produce_uids: Optional[Dict[str, float]] = None  # Resource UID
-    machine_uids: Optional[str] = None  # Machine UID
+    machine_uid: Optional[str] = None  # Machine UID
     process_time_seconds: Optional[float] = None
     rest_time_seconds: Optional[float] = None
+    modifiers_multiplier: Optional[List[float]] = None
+    modifiers_sum: Optional[List[float]] = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -39,9 +41,11 @@ class Process(BaseDBObj):
             'project_uid': dct.get('project_uid'),
             'consume_uids': dct.get('consume_uids'),
             'produce_uids': dct.get('produce_uids'),
-            'machine_uids': dct.get('machine_uids'),
+            'machine_uid': dct.get('machine_uid'),
             'process_time_seconds': dct.get('process_time_seconds'),
             'rest_time_seconds': dct.get('rest_time_seconds'),
+            'modifiers_multiplier': dct.get('modifiers_multiplier'),
+            'modifiers_sum': dct.get('modifiers_sum'),
         })
         obj = cls(**content)
         return obj
@@ -54,9 +58,11 @@ class Process(BaseDBObj):
             'project_uid': self.project_uid,
             'consume_uids': self.consume_uids,
             'produce_uids': self.produce_uids,
-            'machine_uids': self.machine_uids,
+            'machine_uid': self.machine_uid,
             'process_time_seconds': self.process_time_seconds,
             'rest_time_seconds': self.rest_time_seconds,
+            'productivity_modifier': self.modifiers_multiplier,
+            'speed_modifier': self.modifiers_sum,
         })
         return content
 
@@ -65,9 +71,10 @@ class Process(BaseDBObj):
         self.name = project.name
         self.consume_uids = project.consume_uids
         self.produce_uids = project.produce_uids
-        self.machine_uids = project.machine_uids
-        self.process_time_seconds = project.process_time_seconds
-        self.rest_time_seconds = project.rest_time_seconds
+        self.machine_uid = project.machine_uid
+        self.modifiers_multiplier = project.modifiers_multiplier
+        self.modifiers_sum = project.modifiers_sum
+
 
 class ProcessFilter(BaseDBObjFilter):
     name: Optional[List[str]] = None
@@ -98,9 +105,7 @@ class ProcessFilter(BaseDBObjFilter):
                 if not any([uid in self.produce_uids for uid in result.produce_uids]):
                     continue
             if self.machine_uids is not None:
-                if result.machine_uids is None:
-                    continue
-                if self.machine_uids != result.machine_uids:
+                if result.machine_uid not in self.machine_uids:
                     continue
             if self.value_obj_uid is not None:
                 if result.value_obj_uid is None:

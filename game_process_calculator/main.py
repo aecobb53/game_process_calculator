@@ -77,32 +77,44 @@ async def root(requests: Request):
         return {'data_clearing': 'True'}
 
 # Create Endpoints
-@app.post('/projects')
+@app.post('/projects', status_code=201)
 async def create_project(project: Project):
     logger.debug('POST on /projects')
     data_handler = DataHandler()
-    new_project = data_handler.create_project(project)
+    try:
+        new_project = data_handler.create_project(project)
+    except DuplicateRecordsException as err:
+        raise HTTPException(status_code=409, detail=str(err))
     return new_project.put()
 
-@app.post('/resources')
+@app.post('/resources', status_code=201)
 async def create_resource(resource: Resource):
     logger.debug('POST on /resources')
     data_handler = DataHandler()
-    new_resource = data_handler.create_resource(resource)
+    try:
+        new_resource = data_handler.create_resource(resource)
+    except DuplicateRecordsException as err:
+        raise HTTPException(status_code=409, detail=str(err))
     return new_resource.put()
 
-@app.post('/processes')
+@app.post('/processes', status_code=201)
 async def create_process(process: Process):
     logger.debug('POST on /processes')
     data_handler = DataHandler()
-    new_process = data_handler.create_process(process)
+    try:
+        new_process = data_handler.create_process(process)
+    except DuplicateRecordsException as err:
+        raise HTTPException(status_code=409, detail=str(err))
     return new_process.put()
 
-@app.post('/workflows')
+@app.post('/workflows', status_code=201)
 async def create_workflow(workflow: Workflow):
     logger.debug('POST on /workflows')
     data_handler = DataHandler()
-    new_workflow = data_handler.create_workflow(workflow)
+    try:
+        new_workflow = data_handler.create_workflow(workflow)
+    except DuplicateRecordsException as err:
+        raise HTTPException(status_code=409, detail=str(err))
     return new_workflow.put()
 
 # Filter Endpoints
@@ -300,28 +312,29 @@ async def delete_specific_workflow(workflow_uid: str = None):
     return updated_workflow.put()
 
 # Export Endpoints
-@app.get('/export-projects')
+# TODO: Allow for filtering in the exports to just export a project
+@app.get('/export-projects', status_code=200)
 async def export_projects(requests: Request):
     logger.debug('GET on /export-projects')
     project_handler = ProjectHandler()
     content = project_handler.export_projects()
     return content
 
-@app.get('/export-resources')
+@app.get('/export-resources', status_code=200)
 async def export_resources(requests: Request):
     logger.debug('GET on /export-resources')
     resource_handler = ResourceHandler()
     content = resource_handler.export_resources()
     return content
 
-@app.get('/export-processes')
+@app.get('/export-processes', status_code=200)
 async def export_processes(requests: Request):
     logger.debug('GET on /export-processes')
     process_handler = ProcessHandler()
     content = process_handler.export_processes()
     return content
 
-@app.get('/export-workflows')
+@app.get('/export-workflows', status_code=200)
 async def export_workflows(requests: Request):
     logger.debug('GET on /export-workflows')
     workflow_handler = WorkflowHandler()

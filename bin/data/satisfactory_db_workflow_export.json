@@ -1,0 +1,658 @@
+{
+    "workflows": [
+        {
+            "id": 0,
+            "uid": "c695f96a-3a06-49b9-901c-dcabe04e88b7",
+            "creation_datetime": "2024-03-26T02:30:06.129088Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Iron Rod",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f"
+            ],
+            "focus_resource_uids": [
+                "081cbf2e-e29a-49ee-a5c7-8e6e736fda70"
+            ]
+        },
+        {
+            "id": 1,
+            "uid": "f7a6e387-cca4-4757-a666-dfc46ef1f688",
+            "creation_datetime": "2024-03-26T02:30:06.146206Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Iron Plate",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "c14a8255-6645-441b-850d-956643a25ead"
+            ],
+            "focus_resource_uids": [
+                "8b787e7c-938f-4100-bb7b-0686dcee0f7d"
+            ]
+        },
+        {
+            "id": 2,
+            "uid": "38d28f97-87b8-45b6-b98b-b78b4c89e4f1",
+            "creation_datetime": "2024-03-26T02:30:06.163165Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Wire",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "a6881a0b-4fc3-47e4-be0d-2937917d759f"
+            ],
+            "focus_resource_uids": [
+                "a1bc1f0d-f544-490e-aad4-fa6e43d5cbc2"
+            ]
+        },
+        {
+            "id": 3,
+            "uid": "46a6f8bd-1bac-4e46-8186-1e68f59489b5",
+            "creation_datetime": "2024-03-26T02:30:06.180321Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Cable",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "a6881a0b-4fc3-47e4-be0d-2937917d759f",
+                "dafb24b8-26b6-44e8-a39e-ee15033b2d36"
+            ],
+            "focus_resource_uids": [
+                "9a210f83-ef69-4c42-9f90-5ae7439e63c9"
+            ]
+        },
+        {
+            "id": 4,
+            "uid": "e432e812-5ba4-43ff-b1cd-6cf9c349cca3",
+            "creation_datetime": "2024-03-26T02:30:06.197031Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Concrete",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "32a72250-e1c5-43d9-af99-74ca1b7e46b3"
+            ],
+            "focus_resource_uids": [
+                "828eec18-dbb1-412a-a857-f9526c2080d5"
+            ]
+        },
+        {
+            "id": 5,
+            "uid": "00af8fa4-c37f-4d27-aa75-74c3b44fe843",
+            "creation_datetime": "2024-03-26T02:30:06.213579Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Screw",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef"
+            ],
+            "focus_resource_uids": [
+                "11388cd1-aaf9-4262-85f3-7ac5b902ef6c"
+            ]
+        },
+        {
+            "id": 6,
+            "uid": "0db91c1d-4351-492d-b4e2-2079e26b3391",
+            "creation_datetime": "2024-03-26T02:30:06.230386Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Rotor",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef",
+                "c847f0b4-7d65-4117-bab2-fdbd66fa313a"
+            ],
+            "focus_resource_uids": [
+                "f3ce7a3c-01d6-438e-8406-f12fa75bb33f"
+            ]
+        },
+        {
+            "id": 7,
+            "uid": "eb3da0dc-29eb-44cd-9f2e-b30522f62ad6",
+            "creation_datetime": "2024-03-26T02:30:06.247463Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Reinforced Iron Plate",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "c14a8255-6645-441b-850d-956643a25ead",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef",
+                "7323d6d3-43fb-4978-90a0-f822d0c0ba8b"
+            ],
+            "focus_resource_uids": [
+                "d31f2530-cac9-4a4f-85ca-3936cf7d379d"
+            ]
+        },
+        {
+            "id": 8,
+            "uid": "df8b9395-e29b-4215-bf51-9134932ab8cc",
+            "creation_datetime": "2024-03-26T02:30:06.265098Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Modular Frame",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "c14a8255-6645-441b-850d-956643a25ead",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef",
+                "7323d6d3-43fb-4978-90a0-f822d0c0ba8b",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7263c7ba-d7f6-4ce7-9f70-3e52b1f6e21b"
+            ],
+            "focus_resource_uids": [
+                "5fe98a3e-1175-4831-8752-4841128b6ded"
+            ]
+        },
+        {
+            "id": 9,
+            "uid": "4ee6c4ed-1e11-499d-b197-f3b2e0bdec03",
+            "creation_datetime": "2024-03-26T02:30:06.281991Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Steel Beam",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "867ee32b-4c8b-4c59-a79c-86f61d8a61f9",
+                "998d4f10-d003-44e9-9d17-28957f49714e"
+            ],
+            "focus_resource_uids": [
+                "606d935f-8963-4775-8506-636066e1eed8"
+            ]
+        },
+        {
+            "id": 10,
+            "uid": "232da763-84a9-4d9c-af4f-93d5cbc247e2",
+            "creation_datetime": "2024-03-26T02:30:06.299309Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Copper Sheet",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "29cdd3b4-fee8-42a3-b042-2cbc5b67513e"
+            ],
+            "focus_resource_uids": [
+                "7bb29f55-4542-46b7-9e80-886f16413107"
+            ]
+        },
+        {
+            "id": 11,
+            "uid": "4eba8f23-84ad-41ab-9dd7-daedde5a4b5a",
+            "creation_datetime": "2024-03-26T02:30:06.316760Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Encased Industrial Beam",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "867ee32b-4c8b-4c59-a79c-86f61d8a61f9",
+                "998d4f10-d003-44e9-9d17-28957f49714e",
+                "32a72250-e1c5-43d9-af99-74ca1b7e46b3",
+                "ce9a3288-4714-4796-b39e-12d937a0e21c"
+            ],
+            "focus_resource_uids": [
+                "15847610-b3af-440e-97aa-785c5cb45b33"
+            ]
+        },
+        {
+            "id": 12,
+            "uid": "2a617281-8898-4266-8310-00ee5eec2698",
+            "creation_datetime": "2024-03-26T02:30:06.334332Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Steel Pipe",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "867ee32b-4c8b-4c59-a79c-86f61d8a61f9",
+                "94474bbc-4f71-4f95-ad68-1f3dc96320f6"
+            ],
+            "focus_resource_uids": [
+                "6aff11ac-0d82-4619-9198-5cf5c90d47a3"
+            ]
+        },
+        {
+            "id": 13,
+            "uid": "56f5d82b-bf41-4815-8390-8e195d618661",
+            "creation_datetime": "2024-03-26T02:30:06.353723Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Motor",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef",
+                "c847f0b4-7d65-4117-bab2-fdbd66fa313a",
+                "867ee32b-4c8b-4c59-a79c-86f61d8a61f9",
+                "94474bbc-4f71-4f95-ad68-1f3dc96320f6",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "a6881a0b-4fc3-47e4-be0d-2937917d759f",
+                "968945af-17d8-4380-bd44-4b2a4f9ec79d",
+                "08dd06c0-4ba5-44cc-9557-54b0cd1d31a3"
+            ],
+            "focus_resource_uids": [
+                "9ed77f0d-da88-4345-8cc3-249a059c2e91"
+            ]
+        },
+        {
+            "id": 14,
+            "uid": "dd52a61b-e455-41ea-b356-756b553de587",
+            "creation_datetime": "2024-03-26T02:30:06.374148Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Heavy Modular Frame",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "c14a8255-6645-441b-850d-956643a25ead",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef",
+                "7323d6d3-43fb-4978-90a0-f822d0c0ba8b",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7263c7ba-d7f6-4ce7-9f70-3e52b1f6e21b",
+                "867ee32b-4c8b-4c59-a79c-86f61d8a61f9",
+                "94474bbc-4f71-4f95-ad68-1f3dc96320f6",
+                "867ee32b-4c8b-4c59-a79c-86f61d8a61f9",
+                "998d4f10-d003-44e9-9d17-28957f49714e",
+                "32a72250-e1c5-43d9-af99-74ca1b7e46b3",
+                "ce9a3288-4714-4796-b39e-12d937a0e21c",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef",
+                "28bb4ea3-0bd7-4ad5-8176-f1ef0a4a1f77"
+            ],
+            "focus_resource_uids": [
+                "885c4f65-5e31-4d14-88b8-5916bb54e50b"
+            ]
+        },
+        {
+            "id": 15,
+            "uid": "05c51e03-c3b5-4065-9c3a-48aab12fc301",
+            "creation_datetime": "2024-03-26T02:30:06.392886Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Fabric",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "124b0049-a7aa-4b16-9327-c4c0cbf2b31e",
+                "9f7923ce-accc-4889-92ee-5b9a01285482",
+                "21ed2655-c977-453a-9cf9-2ec0321b807a"
+            ],
+            "focus_resource_uids": [
+                "62a747e7-009a-47f4-9117-06fa3e75b017"
+            ]
+        },
+        {
+            "id": 16,
+            "uid": "d829f616-4f90-4598-8191-fbf1c9ab650a",
+            "creation_datetime": "2024-03-26T02:30:06.413545Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Computer",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "29cdd3b4-fee8-42a3-b042-2cbc5b67513e",
+                "5535e008-de37-426e-b656-2c45f26861bc",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "a6881a0b-4fc3-47e4-be0d-2937917d759f",
+                "dafb24b8-26b6-44e8-a39e-ee15033b2d36",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef",
+                "9fc4c265-6885-4430-af6e-e27e8d1a9ed5"
+            ],
+            "focus_resource_uids": [
+                "8ea9e25f-f2c2-4cc9-8bb7-0fab084c01de"
+            ]
+        },
+        {
+            "id": 17,
+            "uid": "eeb77808-a763-46e7-903e-4d758c2e9c8a",
+            "creation_datetime": "2024-03-26T02:30:06.438206Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Alclad Aluminum Sheet",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "bc8f1423-d279-48d8-9024-f2f01cff2353",
+                "e9e1f770-27fe-4c82-8e65-a322e0c1e177",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "6d855162-c297-4aff-925f-b1bb177e1d39"
+            ],
+            "focus_resource_uids": [
+                "7b00dfa6-e848-47c2-acfc-479875b41781"
+            ]
+        },
+        {
+            "id": 18,
+            "uid": "6bde5bec-f8b7-4a03-b98a-78a0a29f5beb",
+            "creation_datetime": "2024-03-26T02:30:06.466897Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Radio Control Unit",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "bc8f1423-d279-48d8-9024-f2f01cff2353",
+                "e9e1f770-27fe-4c82-8e65-a322e0c1e177",
+                "a87b1d31-8f61-4d84-bff5-a7156e088990",
+                "c94ea5a2-bee3-4386-a410-896fea8c78f9",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "a6881a0b-4fc3-47e4-be0d-2937917d759f",
+                "dafb24b8-26b6-44e8-a39e-ee15033b2d36",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "c14a8255-6645-441b-850d-956643a25ead",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef",
+                "7323d6d3-43fb-4978-90a0-f822d0c0ba8b",
+                "9d2db5ae-23d4-4986-9e29-8314a62dc627",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "29cdd3b4-fee8-42a3-b042-2cbc5b67513e",
+                "5535e008-de37-426e-b656-2c45f26861bc",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "a6881a0b-4fc3-47e4-be0d-2937917d759f",
+                "dafb24b8-26b6-44e8-a39e-ee15033b2d36",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef",
+                "9fc4c265-6885-4430-af6e-e27e8d1a9ed5",
+                "8fe25d89-4b29-4e1e-a140-ef637b95c7b9"
+            ],
+            "focus_resource_uids": [
+                "0934c5fc-8914-4084-9404-d9f658afd227"
+            ]
+        },
+        {
+            "id": 19,
+            "uid": "194676bc-6b1f-421c-8664-b8683b05af7b",
+            "creation_datetime": "2024-03-26T02:30:06.490777Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Gas Filter",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "124b0049-a7aa-4b16-9327-c4c0cbf2b31e",
+                "9f7923ce-accc-4889-92ee-5b9a01285482",
+                "21ed2655-c977-453a-9cf9-2ec0321b807a",
+                "3819039a-09fa-456c-a630-1a17b421a164"
+            ],
+            "focus_resource_uids": [
+                "9a9bd613-0606-4b1b-beec-7369eb0095cf"
+            ]
+        },
+        {
+            "id": 20,
+            "uid": "e471a847-e4e3-4f53-aee0-b14de84493ca",
+            "creation_datetime": "2024-03-26T02:30:06.516471Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Supercomputer",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "29cdd3b4-fee8-42a3-b042-2cbc5b67513e",
+                "5535e008-de37-426e-b656-2c45f26861bc",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "a6881a0b-4fc3-47e4-be0d-2937917d759f",
+                "dafb24b8-26b6-44e8-a39e-ee15033b2d36",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef",
+                "9fc4c265-6885-4430-af6e-e27e8d1a9ed5",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "29cdd3b4-fee8-42a3-b042-2cbc5b67513e",
+                "63fd4a1a-f598-40ce-93c3-efd5241de166",
+                "c30e2fe9-602d-4bb3-b57b-55a35ca300ac",
+                "f7a07987-7fad-49e6-82e1-1e91fc19f3e0",
+                "63fd4a1a-f598-40ce-93c3-efd5241de166",
+                "c30e2fe9-602d-4bb3-b57b-55a35ca300ac",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "a6881a0b-4fc3-47e4-be0d-2937917d759f",
+                "dafb24b8-26b6-44e8-a39e-ee15033b2d36",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "29cdd3b4-fee8-42a3-b042-2cbc5b67513e",
+                "5535e008-de37-426e-b656-2c45f26861bc",
+                "dbcdbbac-2a52-4a15-8edd-6c5571017de5",
+                "84c116bf-18ae-40be-b457-efd53f32b5df"
+            ],
+            "focus_resource_uids": [
+                "5f074488-3ce6-45ff-b901-b3ff79d9dbc4"
+            ]
+        },
+        {
+            "id": 21,
+            "uid": "f591cdc0-a524-46b0-ac40-ba345f29258f",
+            "creation_datetime": "2024-03-26T02:30:06.536526Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Aluminum Casing",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "bc8f1423-d279-48d8-9024-f2f01cff2353",
+                "e9e1f770-27fe-4c82-8e65-a322e0c1e177",
+                "a87b1d31-8f61-4d84-bff5-a7156e088990"
+            ],
+            "focus_resource_uids": [
+                "f8d74aa1-6fd8-4148-afb4-2682b3335a35"
+            ]
+        },
+        {
+            "id": 22,
+            "uid": "2bab1267-c62f-46c1-8779-f9dae3972207",
+            "creation_datetime": "2024-03-26T02:30:06.574682Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Electromagnetic Control Rod",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "867ee32b-4c8b-4c59-a79c-86f61d8a61f9",
+                "94474bbc-4f71-4f95-ad68-1f3dc96320f6",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "a6881a0b-4fc3-47e4-be0d-2937917d759f",
+                "968945af-17d8-4380-bd44-4b2a4f9ec79d",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "29cdd3b4-fee8-42a3-b042-2cbc5b67513e",
+                "63fd4a1a-f598-40ce-93c3-efd5241de166",
+                "c30e2fe9-602d-4bb3-b57b-55a35ca300ac",
+                "f7a07987-7fad-49e6-82e1-1e91fc19f3e0",
+                "080abd81-181b-4d2d-92dc-fc01b0237471"
+            ],
+            "focus_resource_uids": [
+                "5aee6334-629d-4017-9c7d-00bc4a39c60b"
+            ]
+        },
+        {
+            "id": 23,
+            "uid": "086d5b2a-0604-493e-b630-fee57710b059",
+            "creation_datetime": "2024-03-26T02:30:06.599847Z",
+            "update_datetime": null,
+            "description": null,
+            "notes": null,
+            "metadata": null,
+            "active": null,
+            "deleted": false,
+            "name": "Turbo Motor",
+            "project_uid": "d6b27f53-5760-43f6-894c-8b61a78cdcf4",
+            "process_type": "LINEAR",
+            "process_uids": [
+                "bc8f1423-d279-48d8-9024-f2f01cff2353",
+                "e9e1f770-27fe-4c82-8e65-a322e0c1e177",
+                "a87b1d31-8f61-4d84-bff5-a7156e088990",
+                "c94ea5a2-bee3-4386-a410-896fea8c78f9",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "a6881a0b-4fc3-47e4-be0d-2937917d759f",
+                "dafb24b8-26b6-44e8-a39e-ee15033b2d36",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "c14a8255-6645-441b-850d-956643a25ead",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef",
+                "7323d6d3-43fb-4978-90a0-f822d0c0ba8b",
+                "9d2db5ae-23d4-4986-9e29-8314a62dc627",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "29cdd3b4-fee8-42a3-b042-2cbc5b67513e",
+                "5535e008-de37-426e-b656-2c45f26861bc",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "a6881a0b-4fc3-47e4-be0d-2937917d759f",
+                "dafb24b8-26b6-44e8-a39e-ee15033b2d36",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef",
+                "9fc4c265-6885-4430-af6e-e27e8d1a9ed5",
+                "8fe25d89-4b29-4e1e-a140-ef637b95c7b9",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "ed64ba79-cea6-4fda-8225-80ceca53d58c",
+                "3520fdae-96ea-4351-93c3-c5cb788beb4f",
+                "7511aa3d-719e-4e65-8a73-ddb58b77f0ef",
+                "c847f0b4-7d65-4117-bab2-fdbd66fa313a",
+                "867ee32b-4c8b-4c59-a79c-86f61d8a61f9",
+                "94474bbc-4f71-4f95-ad68-1f3dc96320f6",
+                "f65342ce-0a6d-494e-8604-58816f612e01",
+                "a6881a0b-4fc3-47e4-be0d-2937917d759f",
+                "968945af-17d8-4380-bd44-4b2a4f9ec79d",
+                "08dd06c0-4ba5-44cc-9557-54b0cd1d31a3",
+                "09d226fe-cff3-4636-aef2-6c91131a7178"
+            ],
+            "focus_resource_uids": [
+                "41ac525a-d5c4-4700-8e36-d4fd43df8d7c"
+            ]
+        }
+    ]
+}

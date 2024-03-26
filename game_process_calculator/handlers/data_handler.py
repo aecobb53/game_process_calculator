@@ -188,7 +188,17 @@ class DataHandler:
         Given a series of processes, what are the resulting resources flows
         """
         workflow_resources = {}
-        for _, process_details in workflow_processes.items():
+        for thing, process_details in workflow_processes.items():
+            print('')
+            print('')
+            print('CALCULATE WORKFLOW RESOURCES WORKFLOW PROCESS DICT')
+            print('')
+            print(thing)
+            print('')
+            print(json.dumps(process_details, indent=2))
+            print('')
+            print('')
+            print('')
             for resource_uid, resource_amount in process_details['consumes_resources'].items():
                 resource = self.find_resource(resource_uid=resource_uid)
                 if resource_uid not in workflow_resources:
@@ -250,9 +260,7 @@ class DataHandler:
 
     def balance_workflow(self,
         workflow: Workflow,
-        balance_criteria: BalanceWorkflowArgs = None,
-        speed_modifier: float = 1,
-        productivity_modifier: float = 1):
+        balance_criteria: BalanceWorkflowArgs = None):
         # TODO: Move speed modifier and productivity modifier into the process and apply upon balance
         """
         Create a dict of processes to alter increase the count of processes needed
@@ -277,15 +285,15 @@ class DataHandler:
                     process_dict['produces_resources'][resource_uid] = resource_amount
             workflow_processes[process_uid] = process_dict
 
+        # Initial calculation of resources
         workflow_resources = self.calculate_workflow_resources(workflow_processes=workflow_processes)
         _, workflow_processes = self.adjust_workflow_processes(workflow=workflow, workflow_processes=workflow_processes, workflow_resources=workflow_resources, balance_criteria=balance_criteria)
         workflow_resources = self.calculate_workflow_resources(workflow_processes=workflow_processes)
-        
-        
+
+        # Adjustment of process counts
         _, workflow_processes = self.adjust_workflow_processes(workflow=workflow, workflow_processes=workflow_processes, workflow_resources=workflow_resources, balance_criteria=balance_criteria)
         workflow_resources = self.calculate_workflow_resources(workflow_processes=workflow_processes)
-        
-        
+
         return workflow_processes, workflow_resources
 
     def return_complex_workflow_object(self, workflows: List[Workflow], balance_criteria: BalanceWorkflowArgs = None):
