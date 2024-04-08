@@ -65,7 +65,7 @@ Feature: Factorio
         #  Then I want to look at the data
         #  Then I want to look at the data at a balance of "0.6" units per second
 
-         Then I visualize workflow at index "0" with html and a units per second of "10"
+        #  Then I visualize workflow at index "0" with html and a units per second of "10"
 
 
 

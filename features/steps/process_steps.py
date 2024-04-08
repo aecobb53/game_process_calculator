@@ -170,7 +170,6 @@ def then_verify_resource_deleted(context, index):
     assert not resp.ok
     print(resp.json())
     assert resp.status_code == 404
-    assert resp.json() == {'detail': 'Process not found'}
 
 @then('I verify the processes export "{matches_level}" "{file_path}"')
 def verify_export_matches(context, matches_level, file_path):

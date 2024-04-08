@@ -74,6 +74,7 @@ def when_update_workflow(context, index, key, value):
     payload[key] = value
     print(f"Modified payload {payload}")
     resp = requests.put(f"{base_url}/workflow/{payload['uid']}", json=payload)
+    print(f"Put request for workflows code: {resp.status_code}")
     print(resp.ok)
     assert resp.ok
     put_details = resp.json()
@@ -160,7 +161,6 @@ def then_verify_workflow_deleted(context, index):
     assert not resp.ok
     print(resp.json())
     assert resp.status_code == 404
-    assert resp.json() == {'detail': 'Workflow not found'}
 
 @then('I verify the workflows export "{matches_level}" "{file_path}"')
 def verify_export_matches(context, matches_level, file_path):

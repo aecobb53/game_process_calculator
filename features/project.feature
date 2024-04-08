@@ -30,6 +30,3 @@ Feature: General Project
         Given I clear all test data
         Given I import projects from "example_import_projects.json"
          Then I verify the projects export "exactly matches" "example_export_projects_2.json"
-
-# Feature: Bad Data Project
-# Feature: Erroring Project

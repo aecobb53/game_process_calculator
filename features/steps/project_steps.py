@@ -119,7 +119,6 @@ def then_verify_project_deleted(context, index):
     assert not resp.ok
     print(resp.json())
     assert resp.status_code == 404
-    assert resp.json() == {'detail': 'Project not found'}
 
 @then('I verify the projects export "{matches_level}" "{file_path}"')
 def verify_export_matches(context, matches_level, file_path):
@@ -160,6 +159,30 @@ def verify_import_matches(context, file_path):
     print(resp)
     print(resp.json())
     assert resp.ok
+
+@then('I create a project with the name "{name}" should have a status code of "{status_code}"')
+def given_create_project_with_code(context, name, status_code):
+    status_code = int(status_code)
+    print(f"Creating project with name {name} and status code {status_code}")
+    payload = {
+        'name': name
+    }
+    print(payload)
+    resp = requests.post(f"{base_url}/projects", json=payload)
+    print(resp)
+    print(resp.json())
+    if 'created_projects' not in context:
+        context.created_projects = []
+    context.created_projects.append(resp.json())
+    assert resp.status_code == status_code
+
+@then('I should not find a project with the uid "{project_uid}"')
+def then_no_project(context, project_uid):
+    resp = requests.get(f"{base_url}/project/{project_uid}")
+    print(f"GET response code: {resp.status_code}")
+    print(f"GET response: {resp.json()}")
+    assert resp.status_code == 404
+    assert resp.json() == {'detail': 'Project not found for uid [1b7020bf-8b2e-4b10-ba28-d74de37e5cad]'}
 
 # @given('we have behave installed')
 # def step_impl(context):

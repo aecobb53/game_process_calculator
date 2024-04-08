@@ -57,36 +57,17 @@ class ProjectHandler(BaseHandler):
         projects = project_filter.filter_results(projects)
         return projects
 
-    def update(self, project: Project) -> Project:
-        projects = self.filter(ProjectFilter(uid=[project.uid]))
-        print(f'IN PROJECT UPDATE FUNCTION')
-
-        if len(projects) == 0:
-            raise IndexError(f"Project with uid {project.uid} not found")
-        elif len(projects) > 1:
-            raise IndexError(f"Project with uid {project.uid} returns multiple results")
-
-        updated_project = self.filter(project_filter=ProjectFilter(uid=[project.uid]))[0]
-        print(project)
-        print(updated_project)
-        updated_project.update(project)
-        self.projects[updated_project.id] = updated_project
+    def update(self, saved_project: Project, project: Project) -> Project:
+        saved_project.update(project)
+        self.projects[saved_project.id] = saved_project
         self.save()
         return deepcopy(project)
 
-    def delete(self, project_uid: int) -> Project:
-        projects = self.filter(ProjectFilter(uid=[project_uid]))
-
-        if len(projects) == 0:
-            raise IndexError(f"Project with uid {project_uid} not found")
-        elif len(projects) > 1:
-            raise IndexError(f"Project with uid {project_uid} returns multiple results")
-
-        delete_project = self.filter(project_filter=ProjectFilter(uid=[project_uid]))[0]
-        delete_project.delete()
-        self.projects[delete_project.id] = delete_project
+    def delete(self, project: Project) -> Project:
+        project.delete()
+        self.projects[project.id] = project
         self.save()
-        return deepcopy(delete_project)
+        return deepcopy(project)
 
     def export_projects(self) -> Dict:
         projects = self.filter(ProjectFilter())
