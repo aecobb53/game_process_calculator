@@ -7,6 +7,7 @@
             "update_datetime": "2020-01-02T00:00:00.000000Z",
             "description": "An example for import and export",
             "notes": null,
+            "metadata": null,
             "active": null,
             "deleted": false,
             "name": "Test Project"

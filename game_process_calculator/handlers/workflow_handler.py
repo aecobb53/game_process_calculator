@@ -56,33 +56,17 @@ class WorkflowHandler(BaseHandler):
         workflows = workflow_filter.filter_results(workflows)
         return workflows
 
-    def update(self, workflow: Workflow) -> Workflow:
-        workflows = self.filter(WorkflowFilter(uid=[workflow.uid]))
-
-        if len(workflows) == 0:
-            raise IndexError(f"Workflow with uid {workflow.uid} not found")
-        elif len(workflows) > 1:
-            raise IndexError(f"Workflow with uid {workflow.uid} returns multiple results")
-
-        updated_workflow = self.filter(workflow_filter=WorkflowFilter(uid=[workflow.uid]))[0]
-        updated_workflow.update(workflow)
-        self.workflows[updated_workflow.id] = updated_workflow
+    def update(self, saved_wrokflow: Workflow, workflow: Workflow) -> Workflow:
+        saved_wrokflow.update(workflow)
+        self.workflows[saved_wrokflow.id] = saved_wrokflow
         self.save()
         return deepcopy(workflow)
 
-    def delete(self, workflow_uid: int) -> Workflow:
-        workflows = self.filter(WorkflowFilter(uid=[workflow_uid]))
-
-        if len(workflows) == 0:
-            raise IndexError(f"Workflow with uid {workflow_uid} not found")
-        elif len(workflows) > 1:
-            raise IndexError(f"Workflow with uid {workflow_uid} returns multiple results")
-
-        delete_workflow = self.filter(workflow_filter=WorkflowFilter(uid=[workflow_uid]))[0]
-        delete_workflow.delete()
-        self.workflows[delete_workflow.id] = delete_workflow
+    def delete(self, workflow: Workflow) -> Workflow:
+        workflow.delete()
+        self.workflows[workflow.id] = workflow
         self.save()
-        return deepcopy(delete_workflow)
+        return deepcopy(workflow)
 
     def export_workflows(self) -> Dict:
         workflows = self.filter(WorkflowFilter())

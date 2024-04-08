@@ -1,8 +1,10 @@
 from copy import deepcopy
 from math import prod
 from phtml import *
+from my_base_html_lib import MyBaseDocument, NavigationContent, SidebarContent, BodyContent, FooterContent
 
 from handlers import DataHandler
+from utils import Utils
 
 
 
@@ -20,14 +22,16 @@ class WorkflowDisplay:
             style_details={
                 'border': '5px solid black',
                 'margin': '10px',
-                'padding': '10px',
+                # 'padding': '10px',
+                'padding': '0px',
             },
             name='workflow-style')
         self.process_style = Style(
             style_details={
-                'border': '3px solid green',
-                'margin': '5px',
-                'padding': '5px',
+                # 'border': '3px solid green',
+                # 'margin': '5px',
+                'margin': '0px',
+                'padding': '2px 2px 5px',
             },
             name='process-style')
         self.process_info_style = Style(style_details={
@@ -36,8 +40,8 @@ class WorkflowDisplay:
             },
             name='process-info-style')
         self.process_consume_produce_info_style = Style(style_details={
-            'padding': '0px',
-            'margin': '5px',
+            'padding': '0px 5px',
+            'margin': '0px',
             },
             name='process-consume-produce-info-style')
 
@@ -59,6 +63,8 @@ class WorkflowDisplay:
             },
             name='table-data-style')
 
+        self.utils = Utils()
+
     @property
     def indent(self):
         return " " * self.indent_spaces
@@ -69,30 +75,51 @@ class WorkflowDisplay:
             if workflow_dict['process_type'] == 'LINEAR':
                 data_div = self.create_linear_workflow(workflow_dict=workflow_dict)
             workflows_data_div.add_element(data_div)
-        self.workflow_doc.add_body_element(workflows_data_div)
-        return self.workflow_doc.return_document
+        navigation_content = NavigationContent(webpage_name="Game Process Calculator")
+        body_content = BodyContent(body_content=[workflows_data_div])
+        footer_content = FooterContent(
+            footer_content=[Header(level=3, internal='Game Process Calculator').add_style(
+                Style(style_details={'margin': '0', 'padding': '0'}))],)
+        new_formated_doc = MyBaseDocument(
+            navigation_content=navigation_content,
+            body_content=body_content,
+            footer_content=footer_content,
+        )
+
+        return new_formated_doc.return_document
 
     def create_linear_workflow(self, workflow_dict, precision=3):
         data_div = Div()
         data_div.add_style(style_obj=self.workflow_style)
         data_div.add_element(
-            Header(3, f"{workflow_dict['name']}:"),
+            Header(1, f"{workflow_dict['name']}:").add_style(
+                Style(style_details={'padding': '10px'})
+            ),
         )
 
         process_overview_div = Div().add_style(
-            style_obj=Style(style_details={'border': '3px solid red'}))
-        detailed_breakdown_div = Div().add_style(
-            style_obj=Style(style_details={'border': '3px solid blue'}))
-        resource_balance_div = Div().add_style(
-            style_obj=Style(style_details={'border': '3px solid blue'}))
+            style_obj=Style(style_details={'padding': '5px'}))
+            # style_obj=Style(style_details={'border': '3px solid red'}))
+        process_overview_div.add_element(Header(2, "Processes Overview:").add_style(
+            Style(style_details={'margin': '0', 'padding': '5px', 'text-decoration': 'underline'})))
 
-        # return data_div
+        detailed_breakdown_div = Div().add_style(
+            style_obj=Style(style_details={'padding': '5px'}))
+            # style_obj=Style(style_details={'border': '3px solid blue'}))
+        detailed_breakdown_div.add_element(Header(2, "Adjusted Process Overview:").add_style(
+            Style(style_details={'margin': '0', 'padding': '5px', 'text-decoration': 'underline'})))
+
+        resource_balance_div = Div().add_style(
+            style_obj=Style(style_details={'padding': '5px'}))
+            # style_obj=Style(style_details={'border': '3px solid blue'}))
+        resource_balance_div.add_element(Header(2, "Resource Balance:").add_style(
+            Style(style_details={'margin': '0', 'padding': '5px', 'text-decoration': 'underline'})))
 
         for process_uid, process_details in workflow_dict['processes_dict'].items():
             # process = process_details['process_metadata']
             process_info_div = Div()
             process_info_style_dict = deepcopy(self.process_style.styles)
-            process_info_style_dict['border'] = '3px solid cyan'
+            # process_info_style_dict['border'] = '3px solid cyan'
             process_info_style = Style(style_details=process_info_style_dict)
             process_info_div.add_style(style_obj=process_info_style)
 
@@ -110,16 +137,18 @@ class WorkflowDisplay:
                 process_info_div.add_element(span)
 
             process_overview_div.add_element(process_info_div)
-            detailed_breakdown_div.add_element(process_info_div)
+            # detailed_breakdown_div.add_element(process_info_div)
 
-            consume_produce_div = Div().add_style(style_obj=Style(style_details={'display': 'inline-block'}))
+            consume_produce_div = Div().add_style(
+                style_obj=Style(style_details={'display': 'inline-block', 'margin': '0', 'padding': '0px 20px 20px'}))
             consumes_div = Div()
-            consumes_div.add_style(style_obj=self.process_style).add_style(Style({'float': 'left'}))
+            consumes_div.add_style(style_obj=self.process_style).add_style(
+                Style({'float': 'left', 'margin': '0', 'padding': '0px 20px'}))
             if process_details['consumes_resources']:
                 consumes_div.add_element(
                     Paragraph("Consumes:").add_style(
                         style_obj=self.process_consume_produce_info_style).add_style(
-                            style_obj=Style(style_details={'font-size': '110%'})
+                            style_obj=Style(style_details={'margin': '0', 'padding': '0px', 'font-size': '110%'})
                         )
                 )
                 for resource_uid, amount in process_details['consumes_resources'].items():
@@ -131,11 +160,12 @@ class WorkflowDisplay:
                 consume_produce_div.add_element(consumes_div)
 
             produces_div = Div()
-            produces_div.add_style(style_obj=self.process_style).add_style(Style({'float': 'left'}))
+            produces_div.add_style(style_obj=self.process_style).add_style(
+                Style({'float': 'left', 'margin': '0', 'padding': '0px 20px'}))
             if process_details['produces_resources']:
                 produces_div.add_element(
                     Paragraph("Produces:").add_style(style_obj=self.process_consume_produce_info_style).add_style(
-                            style_obj=Style(style_details={'font-size': '110%'})
+                            style_obj=Style(style_details={'margin': '0', 'padding': '0px', 'font-size': '110%'})
                         )
                 )
                 for resource_uid, amount in process_details['produces_resources'].items():
@@ -254,9 +284,9 @@ class WorkflowDisplay:
             consumed_per_second = resource_balance_dict['consumed_per_second']
             produced_per_second = resource_balance_dict['produced_per_second']
             net_per_second = produced_per_second - consumed_per_second
-            table_row.add_element(TableData(internal=consumed_per_second))
-            table_row.add_element(TableData(internal=produced_per_second))
-            table_row.add_element(TableData(internal=net_per_second))
+            table_row.add_element(TableData(internal=self.utils.round_up(consumed_per_second, decimal_places=3)))
+            table_row.add_element(TableData(internal=self.utils.round_up(produced_per_second, decimal_places=3)))
+            table_row.add_element(TableData(internal=self.utils.round_up(net_per_second, decimal_places=3)))
             for item in table_row.internal:
                 item.add_style(style_obj=self.table_data_style)
             resource_balance.add_element(table_row)

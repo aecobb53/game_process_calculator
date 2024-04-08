@@ -15,7 +15,6 @@ python-multipart
 
 # Testing
 behave
-coverage
 pycodestyle
 pytest
 pytest-cov
@@ -24,6 +23,9 @@ pytest-mock
 pytest-pep8
 pytest-pythonpath
 pytest-stub
+
+coverage
+pylint
 
 # Database
 # sqlalchemy
@@ -37,3 +39,4 @@ lxml
 
 # My libraries
 git+https://github.com/aecobb53/phtml@main
+git+https://github.com/aecobb53/my_base_html_lib@main

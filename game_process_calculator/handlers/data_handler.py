@@ -151,37 +151,60 @@ class DataHandler:
 
     # Update
     def update_project(self, project: Project):
-        self.find_project(project.uid)  # This may not be needed, but it ensures there is a project with this ID
-        self.project_handler.update(project)
+        saved_project = self.find_project(project.uid)
+        self.project_handler.update(saved_project=saved_project, project=project)
         return project
 
     def update_resource(self, resource: Resource):
-        self.find_resource(resource.uid)  # This may not be needed, but it ensures there is a resource with this ID
-        self.resource_handler.update(resource)
+        saved_resource = self.find_resource(resource.uid)
+        self.resource_handler.update(saved_resource=saved_resource, resource=resource)
         return resource
 
     def update_process(self, process: Process):
-        self.find_process(process.uid)  # This may not be needed, but it ensures there is a process with this ID
-        self.process_handler.update(process)
+        saved_process = self.find_process(process.uid)
+        self.process_handler.update(saved_process=saved_process, process=process)
         return process
 
     def update_workflow(self, workflow: Workflow):
-        self.find_workflow(workflow.uid)  # This may not be needed, but it ensures there is a workflow with this ID
-        self.workflow_handler.update(workflow)
+        saved_wrokflow = self.find_workflow(workflow.uid)
+        self.workflow_handler.update(saved_wrokflow=saved_wrokflow, workflow=workflow)
         return workflow
 
     # delete
-    def delete_project(self, project: Project):
-        return self.project_handler.delete(project)
+    def delete_project(self, project_uid: str):
+        saved_project = self.find_project(project_uid)
+        return self.project_handler.delete(saved_project)
 
-    def delete_resource(self, resource: Resource):
-        return self.resource_handler.delete(resource)
+    def delete_resource(self, resource_uid: str):
+        saved_resource = self.find_resource(resource_uid)
+        return self.resource_handler.delete(saved_resource)
 
-    def delete_process(self, process: Process):
-        return self.process_handler.delete(process)
+    def delete_process(self, process_uid: str):
+        saved_process = self.find_process(process_uid)
+        return self.process_handler.delete(saved_process)
 
-    def delete_workflow(self, workflow: Workflow):
-        return self.workflow_handler.delete(workflow)
+    def delete_workflow(self, workflow_uid: str):
+        saved_wrokflow = self.find_workflow(workflow_uid)
+        return self.workflow_handler.delete(saved_wrokflow)
+
+    def export_database(self):
+        projects = self.project_handler.export_projects()
+        resources = self.resource_handler.export_resources()
+        processes = self.process_handler.export_processes()
+        workflows = self.workflow_handler.export_workflows()
+        content = {
+            'projects': [p.put() for p in projects],
+            'resources': [r.put() for r in resources],
+            'processes': [p.put() for p in processes],
+            'workflows': [w.put() for w in workflows]
+        }
+        return content
+
+    def import_database(self, content):
+        self.project_handler.import_projects(content['projects'])
+        self.resource_handler.import_resources(content['resources'])
+        self.process_handler.import_processes(content['processes'])
+        self.workflow_handler.import_workflows(content['workflows'])
 
     def calculate_workflow_resources(self, workflow_processes):
         """

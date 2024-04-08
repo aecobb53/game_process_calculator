@@ -24,6 +24,36 @@ from utils import Utils
 
 # Utils.convert_to_camel()
 
+
+
+
+
+project_name = 'Satisfactory'
+# Create project if it doesnt already exist
+docker_url = 'http://0.0.0.0'
+port = '8203'
+base_url = docker_url + ':' + port
+# Download html
+params = {
+    'name': 'Turbo Motor',
+    'units_per_second': 17.0,
+}
+resp = requests.get(f"{base_url}/html/visualize-workflows", params=params)
+assert resp.status_code == 200
+html_path = '/home/acobb/git/game_process_calculator/bin/data/focus_file.html'
+with open(html_path, 'w') as hf:
+    hf.write(resp.text)
+
+exit()
+
+
+
+
+
+
+
+
+
 class SatisfactoryItem(BaseModel):
     class_name: str
     name: str

@@ -56,33 +56,17 @@ class ProcessHandler(BaseHandler):
         processes = process_filter.filter_results(processes)
         return processes
 
-    def update(self, process: Process) -> Process:
-        processes = self.filter(ProcessFilter(uid=[process.uid]))
-
-        if len(processes) == 0:
-            raise IndexError(f"Process with uid {process.uid} not found")
-        elif len(processes) > 1:
-            raise IndexError(f"Process with uid {process.uid} returns multiple results")
-
-        updated_process = self.filter(process_filter=ProcessFilter(uid=[process.uid]))[0]
-        updated_process.update(process)
-        self.processes[updated_process.id] = updated_process
+    def update(self, saved_process: Process, process: Process) -> Process:
+        saved_process.update(process)
+        self.processes[saved_process.id] = saved_process
         self.save()
         return deepcopy(process)
 
-    def delete(self, process_uid: int) -> Process:
-        processes = self.filter(ProcessFilter(uid=[process_uid]))
-
-        if len(processes) == 0:
-            raise IndexError(f"Process with uid {process_uid} not found")
-        elif len(processes) > 1:
-            raise IndexError(f"Process with uid {process_uid} returns multiple results")
-
-        delete_process = self.filter(process_filter=ProcessFilter(uid=[process_uid]))[0]
-        delete_process.delete()
-        self.processes[delete_process.id] = delete_process
+    def delete(self, process: Process) -> Process:
+        process.delete()
+        self.processes[process.id] = process
         self.save()
-        return deepcopy(delete_process)
+        return deepcopy(process)
 
     def export_processes(self) -> Dict:
         processes = self.filter(ProcessFilter())

@@ -20,8 +20,8 @@ class Process(BaseDBObj):
     machine_uid: Optional[str] = None  # Machine UID
     process_time_seconds: Optional[float] = None
     rest_time_seconds: Optional[float] = None
-    modifiers_multiplier: Optional[List[float]] = None
-    modifiers_sum: Optional[List[float]] = None
+    # modifiers_multiplier: Optional[List[float]] = None
+    # modifiers_sum: Optional[List[float]] = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -44,8 +44,8 @@ class Process(BaseDBObj):
             'machine_uid': dct.get('machine_uid'),
             'process_time_seconds': dct.get('process_time_seconds'),
             'rest_time_seconds': dct.get('rest_time_seconds'),
-            'modifiers_multiplier': dct.get('modifiers_multiplier'),
-            'modifiers_sum': dct.get('modifiers_sum'),
+            # 'modifiers_multiplier': dct.get('modifiers_multiplier'),
+            # 'modifiers_sum': dct.get('modifiers_sum'),
         })
         obj = cls(**content)
         return obj
@@ -61,8 +61,8 @@ class Process(BaseDBObj):
             'machine_uid': self.machine_uid,
             'process_time_seconds': self.process_time_seconds,
             'rest_time_seconds': self.rest_time_seconds,
-            'productivity_modifier': self.modifiers_multiplier,
-            'speed_modifier': self.modifiers_sum,
+            # 'productivity_modifier': self.modifiers_multiplier,
+            # 'speed_modifier': self.modifiers_sum,
         })
         return content
 
@@ -72,8 +72,8 @@ class Process(BaseDBObj):
         self.consume_uids = project.consume_uids
         self.produce_uids = project.produce_uids
         self.machine_uid = project.machine_uid
-        self.modifiers_multiplier = project.modifiers_multiplier
-        self.modifiers_sum = project.modifiers_sum
+        # self.modifiers_multiplier = project.modifiers_multiplier
+        # self.modifiers_sum = project.modifiers_sum
 
 
 class ProcessFilter(BaseDBObjFilter):

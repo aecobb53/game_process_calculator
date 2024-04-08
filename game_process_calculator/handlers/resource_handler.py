@@ -56,33 +56,17 @@ class ResourceHandler(BaseHandler):
         resources = resource_filter.filter_results(resources)
         return resources
 
-    def update(self, resource: Resource) -> Resource:
-        resources = self.filter(ResourceFilter(uid=[resource.uid]))
-
-        if len(resources) == 0:
-            raise IndexError(f"Resource with uid {resource.uid} not found")
-        elif len(resources) > 1:
-            raise IndexError(f"Resource with uid {resource.uid} returns multiple results")
-
-        updated_resource = self.filter(resource_filter=ResourceFilter(uid=[resource.uid]))[0]
-        updated_resource.update(resource)
-        self.resources[updated_resource.id] = updated_resource
+    def update(self, saved_resource: Resource, resource: Resource) -> Resource:
+        saved_resource.update(resource)
+        self.resources[saved_resource.id] = saved_resource
         self.save()
         return deepcopy(resource)
 
-    def delete(self, resource_uid: int) -> Resource:
-        resources = self.filter(ResourceFilter(uid=[resource_uid]))
-
-        if len(resources) == 0:
-            raise IndexError(f"Resource with uid {resource_uid} not found")
-        elif len(resources) > 1:
-            raise IndexError(f"Resource with uid {resource_uid} returns multiple results")
-
-        delete_resource = self.filter(resource_filter=ResourceFilter(uid=[resource_uid]))[0]
-        delete_resource.delete()
-        self.resources[delete_resource.id] = delete_resource
+    def delete(self, resource: Resource) -> Resource:
+        resource.delete()
+        self.resources[resource.id] = resource
         self.save()
-        return deepcopy(delete_resource)
+        return deepcopy(resource)
 
     def export_resources(self) -> Dict:
         resources = self.filter(ResourceFilter())

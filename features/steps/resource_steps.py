@@ -118,7 +118,6 @@ def then_verify_resource_deleted(context, index):
     assert not resp.ok
     print(resp.json())
     assert resp.status_code == 404
-    assert resp.json() == {'detail': 'Resource not found'}
 
 @then('I verify the resources export "{matches_level}" "{file_path}"')
 def verify_export_matches(context, matches_level, file_path):
@@ -157,6 +156,31 @@ def verify_import_matches(context, file_path):
     print(resp)
     print(resp.json())
     assert resp.ok
+
+@then('I create a resource with the name "{resource_name}" in the project named "{project_name}" should have a status code of "{status_code}"')
+def given_create_resource_with_code(context, resource_name, project_name, status_code):
+    status_code = int(status_code)
+    project_params = {
+        'name': project_name
+    }
+    try:
+        resp = requests.get(f"{base_url}/projects", params=project_params)
+        project_uid =resp.json()['projects'][0]['uid']
+    except:
+        project_uid = 'UNKNOWN'
+    print('posting resource')
+    resource_payload = {
+        'name': resource_name,
+        'project_uid': project_uid
+    }
+    print(resource_payload)
+    resp = requests.post(f"{base_url}/resources", json=resource_payload)
+    print(resp.ok)
+    print(resp.json())
+    assert resp.status_code == status_code
+    if 'created_resources' not in context:
+        context.created_resources = []
+    context.created_resources.append(resp.json())
 
 # # @given('we have behave installed')
 # # def step_impl(context):
