@@ -28,11 +28,21 @@ from utils import Utils
 
 
 
+
 project_name = 'Satisfactory'
 # Create project if it doesnt already exist
 docker_url = 'http://0.0.0.0'
 port = '8203'
 base_url = docker_url + ':' + port
+
+print(f"BASE URL: {base_url}/service-info")
+resp = requests.get(f"{base_url}/service-info")
+print(resp)
+print(resp.text)
+exit()
+
+
+
 # Download html
 params = {
     'name': 'Turbo Motor',

@@ -5,7 +5,6 @@ RUN pip install --upgrade pip
 
 # Environment
 WORKDIR /usr/src
-RUN echo 'its been updated'
 
 RUN mkdir -p /usr/src/etc
 COPY etc/ /usr/src/etc/
