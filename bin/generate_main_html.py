@@ -1,4 +1,3 @@
-from turtle import onclick
 from phtml import *
 from my_base_html_lib import MyBaseDocument, NavigationContent, SidebarContent, BodyContent, FooterContent
 
@@ -14,6 +13,41 @@ major_div_style = Style({'background-color': 'lightblue', 'padding': '10px', 'bo
 
 ## Projects
 projects = Div().add_style(major_div_style)
+create_projects_form = Form(id='create-project', action="/projects", method="POST")
+create_projects_form.add_element("Create")
+create_projects_form.add_element(LineBreak())
+create_projects_form.add_element("Project's Name:")
+create_projects_form.add_element(Input(type="text", id='create-project-name', name="name"))
+projects.add_element(create_projects_form)
+projects.add_element(Button(onclick="createProject()", internal="Create Project"))
+js_create_script = """
+function createProject() {
+            console.log('Creating project');
+            url = "http://localhost:8203/projects";
+
+            const form = document.getElementById('create-project');
+            const formData = new FormData(form);
+
+            var object = {};
+            formData.forEach((value, key) => object[key] = value);
+            var json = JSON.stringify(object);
+
+            console.log('Body');
+            console.log(json);
+            console.log(url);
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: json,
+            })
+            .then(response => response.json())
+            .then(data => console.log(data));
+        }
+"""
+projects.add_element(Script(internal=js_create_script))
 filter_projects_form = Form(id='filter-projects', action="/projects", method="GET")
 filter_projects_form.add_element("Filter")
 filter_projects_form.add_element(LineBreak())
@@ -75,6 +109,36 @@ function findProject() {
         }
 """
 projects.add_element(Script(internal=js_find_script))
+delete_project_form = Form(id='delete-project', action="/project", method="DELETE")
+delete_project_form.add_element("Delete")
+delete_project_form.add_element(LineBreak())
+delete_project_form.add_element("Project's UID:")
+delete_project_form.add_element(Input(type="text", id='delete-project-name', name="project-uid"))
+projects.add_element(delete_project_form)
+projects.add_element(Button(onclick="deleteProject()", internal="Delete Project"))
+js_delete_script = """
+function deleteProject() {
+            console.log('Deleting project');
+            url = "http://localhost:8203/project";
+
+            const form = document.getElementById('delete-project');
+            const formData = new FormData(form);
+            project_uid = formData.get('project-uid');
+
+            url = url + "/" + project_uid;
+            console.log(url);
+
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => console.log(data));
+        }
+"""
+projects.add_element(Script(internal=js_delete_script))
 doc.add_body_element(projects)
 doc.add_body_element(LineBreak())
 

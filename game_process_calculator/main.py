@@ -25,7 +25,7 @@ from models import (
     ResponseTypes)
 from handlers import ProjectHandler, ResourceHandler, ProcessHandler, WorkflowHandler, DataHandler
 from utils import parse_query_params, parse_header, MissingRecordException, DuplicateRecordsException
-from html import WorkflowDisplay
+from html import WorkflowDisplay, filter_projects_html_page
 
 
 from my_base_html_lib import MyBaseDocument, NavigationContent, SidebarContent, BodyContent, FooterContent
@@ -633,6 +633,28 @@ async def visualize_workflow_html(request: Request):
     with open(os.path.join('deleteme_html_files', 'workflow.html'), 'w') as f:
         f.write(workflow_html)
     return HTMLResponse(content=workflow_html, status_code=200)
+
+
+@app.get('/html/projects')
+async def html_projects(request: Request):
+    logger.debug('GET on /html/projects')
+    project_page = filter_projects_html_page()
+    # workflow_filter = parse_query_params(request=request, query_class=WorkflowFilter)
+    # logger.debug(f'Workflow Filter: {workflow_filter}')
+    # balance_params = parse_query_params(request=request, query_class=BalanceWorkflowArgs)
+    # logger.debug(f'Balance Params: {balance_params}')
+    # data_handler = DataHandler()
+    # workflows = data_handler.filter_workflows(workflow_filter=workflow_filter)
+    # workflows_dict = data_handler.return_complex_workflow_object(
+    #     workflows=workflows,
+    #     balance_criteria=balance_params)
+    # workflow_doc = WorkflowDisplay(workflows_dict=workflows_dict)
+    # workflow_html = workflow_doc.display_workflow()
+    # with open(os.path.join('deleteme_html_files', 'workflow.html'), 'w') as f:
+    #     f.write(workflow_html)
+    return HTMLResponse(content=project_page, status_code=200)
+
+
 
 
 """
