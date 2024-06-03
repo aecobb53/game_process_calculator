@@ -212,16 +212,16 @@ class DataHandler:
         """
         workflow_resources = {}
         for thing, process_details in workflow_processes.items():
-            print('')
-            print('')
-            print('CALCULATE WORKFLOW RESOURCES WORKFLOW PROCESS DICT')
-            print('')
-            print(thing)
-            print('')
-            print(json.dumps(process_details, indent=2))
-            print('')
-            print('')
-            print('')
+            # print('')
+            # print('')
+            # print('CALCULATE WORKFLOW RESOURCES WORKFLOW PROCESS DICT')
+            # print('')
+            # print(thing)
+            # print('')
+            # print(json.dumps(process_details, indent=2))
+            # print('')
+            # print('')
+            # print('')
             for resource_uid, resource_amount in process_details['consumes_resources'].items():
                 resource = self.find_resource(resource_uid=resource_uid)
                 if resource_uid not in workflow_resources:
@@ -248,7 +248,7 @@ class DataHandler:
         """
         Given a series of resources, adjust the processes to meet the balance criteria
         """
-        print('ADJUSTING WORKFLOW PROCESSES')
+        # print('ADJUSTING WORKFLOW PROCESSES')
         adjusted = False
         for resource_uid, resource_data in workflow_resources.items():
             if resource_uid in workflow.focus_resource_uids:
@@ -264,19 +264,19 @@ class DataHandler:
         if not adjusted:
             for resource_uid, resource_data in workflow_resources.items():
                 if resource_data['consumed_per_second'] > 0 and resource_data['produced_per_second'] > 0:
-                    print(resource_uid)
-                    print(json.dumps(resource_data, indent=2))
+                    # print(resource_uid)
+                    # print(json.dumps(resource_data, indent=2))
                     if resource_data['produced_per_second'] < resource_data['consumed_per_second']:
-                        print('NEED TO ADJUST')
+                        # print('NEED TO ADJUST')
                         for process_uid, processes_dict in workflow_processes.items():
                             if resource_uid in processes_dict['produces_resources']:
-                                print(f"FOUND FOR ADJUSTMENT: {process_uid}")
-                                print(json.dumps(processes_dict, indent=2))
+                                # print(f"FOUND FOR ADJUSTMENT: {process_uid}")
+                                # print(json.dumps(processes_dict, indent=2))
                                 adjustment = (resource_data['consumed_per_second'] - resource_data['produced_per_second']) / (
                                     processes_dict['produces_resources'][resource_uid] / processes_dict['process_time_seconds']
                                 )
                                 adjustment = self.utils.round_up(number=adjustment)
-                                print(f"Adjustment: {adjustment}")
+                                # print(f"Adjustment: {adjustment}")
                                 workflow_processes[process_uid]['process_count'] += adjustment
                                 adjusted = True
         return adjusted, workflow_processes
@@ -334,14 +334,14 @@ class DataHandler:
 
 
 
-        with open('DELETEME_IM_NOT_NEEDED.json', 'w') as jf:
-            jf.write(json.dumps(workflows_dict, indent=4))
-        for resource_uid, resource_data in resources_dict.items():
-            print('')
-            print(resource_data['name'])
-            print(resource_data['consumed_per_second'], resource_data['produced_per_second'])
-            net = resource_data['produced_per_second'] - resource_data['consumed_per_second']
-            print(f"Net: {net}")
+        # with open('DELETEME_IM_NOT_NEEDED.json', 'w') as jf:
+        #     jf.write(json.dumps(workflows_dict, indent=4))
+        # for resource_uid, resource_data in resources_dict.items():
+        #     print('')
+        #     print(resource_data['name'])
+        #     print(resource_data['consumed_per_second'], resource_data['produced_per_second'])
+        #     net = resource_data['produced_per_second'] - resource_data['consumed_per_second']
+        #     print(f"Net: {net}")
 
 
 

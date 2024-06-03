@@ -1,5 +1,4 @@
 from copy import deepcopy
-from math import prod
 from phtml import *
 from my_base_html_lib import MyBaseDocument, NavigationContent, SidebarContent, BodyContent, FooterContent
 
