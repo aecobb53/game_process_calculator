@@ -609,10 +609,10 @@ async def import_workflows(request: Request):
 @app.post('/import-database')
 async def database(request: Request):
     logger.debug('POST on /import-database')
-    imported_workflows = await request.json()
+    imported_data = await request.json()
     data_handler = DataHandler()
     try:
-        data_handler.import_database(dct=imported_workflows)
+        data_handler.import_database(content=imported_data)
     except Exception as err:
         logger.error(f'ERROR: {err}')
         raise HTTPException(status_code=500, detail='Internal Server Error')

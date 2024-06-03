@@ -193,10 +193,10 @@ class DataHandler:
         processes = self.process_handler.export_processes()
         workflows = self.workflow_handler.export_workflows()
         content = {
-            'projects': [p.put() for p in projects],
-            'resources': [r.put() for r in resources],
-            'processes': [p.put() for p in processes],
-            'workflows': [w.put() for w in workflows]
+            'projects': projects,
+            'resources': resources,
+            'processes': processes,
+            'workflows': workflows
         }
         return content
 

@@ -32,6 +32,7 @@ from utils import Utils
 project_name = 'Satisfactory'
 # Create project if it doesnt already exist
 docker_url = 'http://0.0.0.0'
+docker_url = 'http://hamster.nax.lol'
 port = '8203'
 base_url = docker_url + ':' + port
 
