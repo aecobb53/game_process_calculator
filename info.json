@@ -1,0 +1,5 @@
+{
+    "service_name": "Game Process Calculator",
+    "description": "Calculate workflows for strategy games.",
+    "version": "0.1.0"
+}
