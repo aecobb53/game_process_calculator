@@ -25,7 +25,7 @@ from models import (
     ResponseTypes)
 from handlers import ProjectHandler, ResourceHandler, ProcessHandler, WorkflowHandler, DataHandler
 from utils import parse_query_params, parse_header, MissingRecordException, DuplicateRecordsException
-from html import WorkflowDisplay, filter_projects_html_page
+from html import WorkflowDisplay, create_project_html_page, filter_projects_html_page, find_project_html_page
 
 
 from my_base_html_lib import MyBaseDocument, NavigationContent, SidebarContent, BodyContent, FooterContent
@@ -336,6 +336,9 @@ async def update_project(project_uuid: str, project: Project):
     data_handler = DataHandler()
     try:
         updated_project = data_handler.update_project(project)
+    except DuplicateRecordsException as err:
+        logger.debug(f"Dupe workflow attempt: {err}")
+        raise HTTPException(status_code=409, detail=str(err))
     except MissingRecordException as err:
         logger.error(f"ERROR: {err}")
         raise HTTPException(status_code=404, detail=str(err))
@@ -357,6 +360,9 @@ async def update_resource(resource_uuid: str, resource: Resource):
     data_handler = DataHandler()
     try:
         updated_resource = data_handler.update_resource(resource)
+    except DuplicateRecordsException as err:
+        logger.debug(f"Dupe workflow attempt: {err}")
+        raise HTTPException(status_code=409, detail=str(err))
     except MissingRecordException as err:
         logger.error(f"ERROR: {err}")
         raise HTTPException(status_code=404, detail=str(err))
@@ -378,6 +384,9 @@ async def update_process(process_uuid: str, process: Process):
     data_handler = DataHandler()
     try:
         updated_process = data_handler.update_process(process)
+    except DuplicateRecordsException as err:
+        logger.debug(f"Dupe workflow attempt: {err}")
+        raise HTTPException(status_code=409, detail=str(err))
     except MissingRecordException as err:
         logger.error(f"ERROR: {err}")
         raise HTTPException(status_code=404, detail=str(err))
@@ -399,6 +408,9 @@ async def update_workflow(workflow_uuid: str, workflow: Workflow):
     data_handler = DataHandler()
     try:
         updated_workflow = data_handler.update_workflow(workflow)
+    except DuplicateRecordsException as err:
+        logger.debug(f"Dupe workflow attempt: {err}")
+        raise HTTPException(status_code=409, detail=str(err))
     except MissingRecordException as err:
         logger.error(f"ERROR: {err}")
         raise HTTPException(status_code=404, detail=str(err))
@@ -639,22 +651,31 @@ async def visualize_workflow_html(request: Request):
 async def html_projects(request: Request):
     logger.debug('GET on /html/projects')
     project_page = filter_projects_html_page()
-    # workflow_filter = parse_query_params(request=request, query_class=WorkflowFilter)
-    # logger.debug(f'Workflow Filter: {workflow_filter}')
-    # balance_params = parse_query_params(request=request, query_class=BalanceWorkflowArgs)
-    # logger.debug(f'Balance Params: {balance_params}')
-    # data_handler = DataHandler()
-    # workflows = data_handler.filter_workflows(workflow_filter=workflow_filter)
-    # workflows_dict = data_handler.return_complex_workflow_object(
-    #     workflows=workflows,
-    #     balance_criteria=balance_params)
-    # workflow_doc = WorkflowDisplay(workflows_dict=workflows_dict)
-    # workflow_html = workflow_doc.display_workflow()
-    # with open(os.path.join('deleteme_html_files', 'workflow.html'), 'w') as f:
-    #     f.write(workflow_html)
     return HTMLResponse(content=project_page, status_code=200)
 
+@app.get('/html/project/{project_uid}')
+async def html_projects(request: Request, project_uid: str):
+    logger.debug(f'GET on /html/project/{project_uid}')
+    data_handler = DataHandler()
+    try:
+        project = data_handler.find_project(project_uid=project_uid)
+    except MissingRecordException as err:
+        logger.error(f"ERROR: {err}")
+        raise HTTPException(status_code=404, detail=str(err))
+    except DuplicateRecordsException as err:
+        logger.error(f"ERROR: {err}")
+        raise HTTPException(status_code=404, detail=str(err))
+    except Exception as err:
+        logger.error(f'ERROR: {err}')
+        raise HTTPException(status_code=500, detail='Internal Server Error')
+    project_page = find_project_html_page(project=project)
+    return HTMLResponse(content=project_page, status_code=200)
 
+@app.get('/html/create-project')
+async def html_projects(request: Request):
+    logger.debug(f'GET on /html/create-project')
+    project_page = create_project_html_page()
+    return HTMLResponse(content=project_page, status_code=200)
 
 
 """
