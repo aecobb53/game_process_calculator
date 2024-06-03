@@ -4,3 +4,4 @@ from .process import Process, ProcessFilter
 from .resource import Resource, ResourceFilter
 from .workflow import Workflow, ProcessType, WorkflowFilter
 from .balancing_args import BalanceWorkflowArgs
+from .request_models import RestHeaders, ResponseTypes

@@ -4,6 +4,7 @@ import logging
 
 from logging.handlers import RotatingFileHandler
 from logging import FileHandler , StreamHandler
+import re
 from fastapi import FastAPI, Query, Request, HTTPException
 from fastapi.responses import HTMLResponse, ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,10 +20,17 @@ from models import (
     Workflow,
     WorkflowFilter,
     ProcessType,
-    BalanceWorkflowArgs)
+    BalanceWorkflowArgs,
+    RestHeaders,
+    ResponseTypes)
 from handlers import ProjectHandler, ResourceHandler, ProcessHandler, WorkflowHandler, DataHandler
-from utils import parse_query_params, MissingRecordException, DuplicateRecordsException
-from html import WorkflowDisplay
+from utils import parse_query_params, parse_header, MissingRecordException, DuplicateRecordsException
+from html import WorkflowDisplay, create_project_html_page, filter_projects_html_page, find_project_html_page
+
+
+from my_base_html_lib import MyBaseDocument, NavigationContent, SidebarContent, BodyContent, FooterContent
+from phtml import Style, Header
+
 
 appname = 'game_process_calculator'
 
@@ -60,13 +68,67 @@ app.add_middleware(
 
 # Root
 @app.get('/')
-async def root(requests: Request):
+async def root(request: Request):
     logger.debug('GET on /')
+    logger.debug(f"REQUEST STUFF")
+    header_details = RestHeaders(request=request)
+    if header_details.response_type == ResponseTypes.HTML:
+        return HTMLResponse(content=WorkflowDisplay().display())
+    elif header_details.response_type == ResponseTypes.JSON:
+        return {'Hello': 'WORLD!'}
     return {'Hello': 'WORLD!'}
+
+@app.get('/testing-rest', status_code=200)
+async def testing_rest(request: Request):
+    logger.debug('GET on /testing-rest')
+    resp = {}
+    try:
+        logger.debug(f"HEADER")
+        logger.debug(f"{request.headers}")
+        resp['headers'] = request.headers
+    except:
+        pass
+    try:
+        logger.debug(f"QUERY PARAMS")
+        logger.debug(f"{request.query_params}")
+        resp['query_params'] = request.query_params
+    except:
+        pass
+    try:
+        logger.debug(f"BODY")
+        body = await request.body()
+        logger.debug(f"{body}")
+        resp['body'] = body
+    except:
+        pass
+    return resp
+    # return {'Hello': 'WORLD!'}
+
+@app.get('/service-info', status_code=200)
+async def service_info(request: Request):
+    logger.debug('GET on /service-info')
+    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'info.json')
+    header_details = RestHeaders(request=request)
+    with open(file_path, 'r') as f:
+        service_info = json.load(f)
+    if header_details.response_type == ResponseTypes.HTML:
+        navigation_content = NavigationContent(webpage_name="Game Process Calculator")
+        body_content = BodyContent(body_content=[service_info])
+        footer_content = FooterContent(
+            footer_content=[Header(level=3, internal='Game Process Calculator').add_style(
+                Style(style_details={'margin': '0', 'padding': '0'}))],)
+        new_formated_doc = MyBaseDocument(
+            navigation_content=navigation_content,
+            body_content=body_content,
+            footer_content=footer_content,
+        )
+        return HTMLResponse(content=new_formated_doc.return_document, status_code=200)
+    elif header_details.response_type == ResponseTypes.JSON:
+        return service_info
 
 # DEV CLEAR DATA
 @app.post('/clear-test-data')
-async def root(requests: Request):
+async def root(request: Request):
     logger.debug('POST on /clear-test-data')
     if str(os.environ['TESTING']) == '1':
         logger.debug('CLEARING DATA')
@@ -274,6 +336,9 @@ async def update_project(project_uuid: str, project: Project):
     data_handler = DataHandler()
     try:
         updated_project = data_handler.update_project(project)
+    except DuplicateRecordsException as err:
+        logger.debug(f"Dupe workflow attempt: {err}")
+        raise HTTPException(status_code=409, detail=str(err))
     except MissingRecordException as err:
         logger.error(f"ERROR: {err}")
         raise HTTPException(status_code=404, detail=str(err))
@@ -295,6 +360,9 @@ async def update_resource(resource_uuid: str, resource: Resource):
     data_handler = DataHandler()
     try:
         updated_resource = data_handler.update_resource(resource)
+    except DuplicateRecordsException as err:
+        logger.debug(f"Dupe workflow attempt: {err}")
+        raise HTTPException(status_code=409, detail=str(err))
     except MissingRecordException as err:
         logger.error(f"ERROR: {err}")
         raise HTTPException(status_code=404, detail=str(err))
@@ -316,6 +384,9 @@ async def update_process(process_uuid: str, process: Process):
     data_handler = DataHandler()
     try:
         updated_process = data_handler.update_process(process)
+    except DuplicateRecordsException as err:
+        logger.debug(f"Dupe workflow attempt: {err}")
+        raise HTTPException(status_code=409, detail=str(err))
     except MissingRecordException as err:
         logger.error(f"ERROR: {err}")
         raise HTTPException(status_code=404, detail=str(err))
@@ -337,6 +408,9 @@ async def update_workflow(workflow_uuid: str, workflow: Workflow):
     data_handler = DataHandler()
     try:
         updated_workflow = data_handler.update_workflow(workflow)
+    except DuplicateRecordsException as err:
+        logger.debug(f"Dupe workflow attempt: {err}")
+        raise HTTPException(status_code=409, detail=str(err))
     except MissingRecordException as err:
         logger.error(f"ERROR: {err}")
         raise HTTPException(status_code=404, detail=str(err))
@@ -348,12 +422,6 @@ async def update_workflow(workflow_uuid: str, workflow: Workflow):
         raise HTTPException(status_code=500, detail='Internal Server Error')
     logger.debug(f"Updated workflow: {updated_workflow}")
     return updated_workflow.put()
-
-
-
-
-
-
 
 # Delete Endpoints
 @app.delete('/project/{project_uid}', status_code=200)
@@ -435,7 +503,7 @@ async def delete_specific_workflow(workflow_uid: str = None):
 # Export Endpoints
 # TODO: Allow for filtering in the exports to just export a project
 @app.get('/export-projects', status_code=200)
-async def export_projects(requests: Request):
+async def export_projects(request: Request):
     logger.debug('GET on /export-projects')
     project_handler = ProjectHandler()
     try:
@@ -446,7 +514,7 @@ async def export_projects(requests: Request):
     return content
 
 @app.get('/export-resources', status_code=200)
-async def export_resources(requests: Request):
+async def export_resources(request: Request):
     logger.debug('GET on /export-resources')
     resource_handler = ResourceHandler()
     try:
@@ -457,7 +525,7 @@ async def export_resources(requests: Request):
     return content
 
 @app.get('/export-processes', status_code=200)
-async def export_processes(requests: Request):
+async def export_processes(request: Request):
     logger.debug('GET on /export-processes')
     process_handler = ProcessHandler()
     try:
@@ -468,7 +536,7 @@ async def export_processes(requests: Request):
     return content
 
 @app.get('/export-workflows', status_code=200)
-async def export_workflows(requests: Request):
+async def export_workflows(request: Request):
     logger.debug('GET on /export-workflows')
     workflow_handler = WorkflowHandler()
     try:
@@ -479,7 +547,7 @@ async def export_workflows(requests: Request):
     return content
 
 @app.get('/export-database', status_code=200)
-async def export_database(requests: Request):
+async def export_database(request: Request):
     logger.debug('GET on /export-database')
     data_handler = DataHandler()
     try:
@@ -564,7 +632,9 @@ async def visualize_workflows(request: Request):
 async def visualize_workflow_html(request: Request):
     logger.debug('GET on /html/visualize-workflows')
     workflow_filter = parse_query_params(request=request, query_class=WorkflowFilter)
+    logger.debug(f'Workflow Filter: {workflow_filter}')
     balance_params = parse_query_params(request=request, query_class=BalanceWorkflowArgs)
+    logger.debug(f'Balance Params: {balance_params}')
     data_handler = DataHandler()
     workflows = data_handler.filter_workflows(workflow_filter=workflow_filter)
     workflows_dict = data_handler.return_complex_workflow_object(
@@ -575,6 +645,81 @@ async def visualize_workflow_html(request: Request):
     with open(os.path.join('deleteme_html_files', 'workflow.html'), 'w') as f:
         f.write(workflow_html)
     return HTMLResponse(content=workflow_html, status_code=200)
+
+
+@app.get('/html/projects')
+async def html_projects(request: Request):
+    logger.debug('GET on /html/projects')
+    project_page = filter_projects_html_page()
+    return HTMLResponse(content=project_page, status_code=200)
+
+@app.get('/html/project/{project_uid}')
+async def html_projects(request: Request, project_uid: str):
+    logger.debug(f'GET on /html/project/{project_uid}')
+    data_handler = DataHandler()
+    try:
+        project = data_handler.find_project(project_uid=project_uid)
+    except MissingRecordException as err:
+        logger.error(f"ERROR: {err}")
+        raise HTTPException(status_code=404, detail=str(err))
+    except DuplicateRecordsException as err:
+        logger.error(f"ERROR: {err}")
+        raise HTTPException(status_code=404, detail=str(err))
+    except Exception as err:
+        logger.error(f'ERROR: {err}')
+        raise HTTPException(status_code=500, detail='Internal Server Error')
+    project_page = find_project_html_page(project=project)
+    return HTMLResponse(content=project_page, status_code=200)
+
+@app.get('/html/create-project')
+async def html_projects(request: Request):
+    logger.debug(f'GET on /html/create-project')
+    project_page = create_project_html_page()
+    return HTMLResponse(content=project_page, status_code=200)
+
+
+"""
+HTML endpoints
+/
+    - Home page with links to other pages
+/service-info
+    - Short info about service
+    - Include app versions?
+
+(Create if no thing exists)
+/update-project
+/update-resource
+/update-process
+/update-workflow
+
+/filter-projects
+/filter-resources
+/filter-processes
+/filter-workflows
+
+/visualize-project  (All associated thigns with links to each thing)
+/visualize-resources
+/visualize-processes
+/visualize-workflows
+"""
+
+
+# OLD WORKING VERSION
+# @app.get('/html/visualize-workflows')
+# async def visualize_workflow_html(request: Request):
+#     logger.debug('GET on /html/visualize-workflows')
+#     workflow_filter = parse_query_params(request=request, query_class=WorkflowFilter)
+#     balance_params = parse_query_params(request=request, query_class=BalanceWorkflowArgs)
+#     data_handler = DataHandler()
+#     workflows = data_handler.filter_workflows(workflow_filter=workflow_filter)
+#     workflows_dict = data_handler.return_complex_workflow_object(
+#         workflows=workflows,
+#         balance_criteria=balance_params)
+#     workflow_doc = WorkflowDisplay(workflows_dict=workflows_dict)
+#     workflow_html = workflow_doc.display_workflow()
+#     with open(os.path.join('deleteme_html_files', 'workflow.html'), 'w') as f:
+#         f.write(workflow_html)
+#     return HTMLResponse(content=workflow_html, status_code=200)
 
 # @app.get('/html/visualize-workflows/{workflow_uid}')
 # async def visualize_workflow_html(workflow_uid: str = None):

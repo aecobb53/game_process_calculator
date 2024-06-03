@@ -15,6 +15,8 @@
 - Add filtering to export things
 - Add DB import/export tests
 
+- Add change log parser to the service info?
+
 
 MVP1
 

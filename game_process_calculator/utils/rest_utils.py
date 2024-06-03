@@ -43,3 +43,26 @@ def parse_query_params(request, query_class=None, body_class=None):
         query_params = query_class(**query_params)
     # print(f"Query params: {query_params}")
     return query_params
+
+def parse_header(request):
+    header = request.headers
+    content = {}
+    if 'host' in header:
+        content['host'] = header['host']
+    if 'connection' in header:
+        content['connection'] = header['connection']
+    if 'sec-ch-ua' in header:
+        content['sec-ch-ua'] = header['sec-ch-ua']
+    if 'Chromium' in header:
+        content['Chromium'] = header['Chromium']
+    if 'sec-ch-ua-platform' in header:
+        content['sec-ch-ua-platform'] = header['sec-ch-ua-platform']
+    if 'upgrade-insecure-requests' in header:
+        content['upgrade-insecure-requests'] = header['upgrade-insecure-requests']
+    if 'user-agent' in header:
+        content['user-agent'] = header['user-agent']
+    if 'accept' in header:
+        content['accept'] = header['accept']
+    if 'accept-encoding' in header:
+        content['accept-encoding'] = header['accept-encoding']
+    return content
