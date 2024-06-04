@@ -13,4 +13,5 @@ services:
         ports:
             - 8203:8000
         environment:
-            - TESTING=1
+            - LOGICAL_ENV=${LOGICAL_ENV}
+            - SERVICE_URL=${GAME_PROCESS_CALCULATOR_SERVICE_URL}

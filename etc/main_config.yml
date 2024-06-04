@@ -1,0 +1,6 @@
+LOGICAL_ENV:
+    DEV:
+        service_url: http://localhost:8203
+    PROD:
+        service_url: http://hamster.nax.lol:8203
+

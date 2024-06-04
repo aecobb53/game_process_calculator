@@ -1,3 +1,4 @@
+from glob import glob
 import json
 import os
 import logging
@@ -25,7 +26,7 @@ from models import (
     ResponseTypes)
 from handlers import ProjectHandler, ResourceHandler, ProcessHandler, WorkflowHandler, DataHandler
 from utils import parse_query_params, parse_header, MissingRecordException, DuplicateRecordsException
-from html import WorkflowDisplay, create_project_html_page, filter_projects_html_page, find_project_html_page
+from html import WorkflowDisplay, create_project_html_page, filter_projects_html_page, filter_resources_html_page, find_project_html_page, project_base_page
 
 
 from my_base_html_lib import MyBaseDocument, NavigationContent, SidebarContent, BodyContent, FooterContent
@@ -55,7 +56,8 @@ if os.environ.get('STREAM_HANDLER', 'True') == 'True':
     logger.addHandler(sh)
 
 app = FastAPI()
-
+# context = ContextSingleton()
+# context.add_logger(logger)
 # Setting up CORS and who can access the API
 origins = ["*"]
 app.add_middleware(
@@ -66,14 +68,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# @app.on_event('startup')
+# async def update_context():
+#     print('IN STARTUP')
+#     context.add_logger(logger)
+#     # context.config = {}
+
 # Root
-@app.get('/')
+@app.get('/', status_code=200)
 async def root(request: Request):
     logger.debug('GET on /')
     logger.debug(f"REQUEST STUFF")
     header_details = RestHeaders(request=request)
     if header_details.response_type == ResponseTypes.HTML:
-        return HTMLResponse(content=WorkflowDisplay().display())
+        project_page = project_base_page()
+        return HTMLResponse(content=project_page)
     elif header_details.response_type == ResponseTypes.JSON:
         return {'Hello': 'WORLD!'}
     return {'Hello': 'WORLD!'}
@@ -653,6 +662,12 @@ async def html_projects(request: Request):
     project_page = filter_projects_html_page()
     return HTMLResponse(content=project_page, status_code=200)
 
+@app.get('/html/resources')
+async def html_resources(request: Request):
+    logger.debug('GET on /html/resources')
+    resource_page = filter_resources_html_page()
+    return HTMLResponse(content=resource_page, status_code=200)
+
 @app.get('/html/project/{project_uid}')
 async def html_projects(request: Request, project_uid: str):
     logger.debug(f'GET on /html/project/{project_uid}')
@@ -671,13 +686,13 @@ async def html_projects(request: Request, project_uid: str):
     project_page = find_project_html_page(project=project)
     return HTMLResponse(content=project_page, status_code=200)
 
-@app.get('/html/create-project')
-async def html_projects(request: Request):
-    logger.debug(f'GET on /html/create-project')
+@app.get('/html/modify-project')
+async def modify_html_projects(request: Request):
+    logger.debug(f'GET on /html/modify-project')
     project_page = create_project_html_page()
     return HTMLResponse(content=project_page, status_code=200)
 
-
+filter_resources_html_page
 """
 HTML endpoints
 /

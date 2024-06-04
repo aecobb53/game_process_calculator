@@ -13,11 +13,11 @@ major_div_style = Style({'background-color': 'lightblue', 'padding': '10px', 'bo
 
 ## Projects
 projects = Div().add_style(major_div_style)
-create_projects_form = Form(id='create-project', action="/projects", method="POST")
+create_projects_form = Form(id='modify-project', action="/projects", method="POST")
 create_projects_form.add_element("Create")
 create_projects_form.add_element(LineBreak())
 create_projects_form.add_element("Project's Name:")
-create_projects_form.add_element(Input(type="text", id='create-project-name', name="name"))
+create_projects_form.add_element(Input(type="text", id='modify-project-name', name="name"))
 projects.add_element(create_projects_form)
 projects.add_element(Button(onclick="createProject()", internal="Create Project"))
 js_create_script = """
@@ -25,7 +25,7 @@ function createProject() {
             console.log('Creating project');
             url = "http://localhost:8203/projects";
 
-            const form = document.getElementById('create-project');
+            const form = document.getElementById('modify-project');
             const formData = new FormData(form);
 
             var object = {};

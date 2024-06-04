@@ -122,7 +122,6 @@ async function populateTable() {
         // Project Name
         var project_hyperlink = document.createElement("a");
         project_hyperlink.href = service_url + '/html/project/' + projects_array[i].uid;
-        project_hyperlink.title = projects_array[i].name;
         project_hyperlink.innerHTML = projects_array[i].name;
 
         var projects_table_item = document.createElement('td');

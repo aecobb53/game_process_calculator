@@ -1,24 +1,22 @@
-from turtle import onclick
-from unittest import result
+import os
+
 from phtml import *
 from my_base_html_lib import MyBaseDocument, NavigationContent, SidebarContent, BodyContent, FooterContent
 
-
-service_url = 'http://localhost:8203'  # Change to config value!
-
+service_url = os.environ.get('SERVICE_URL')
 
 
 def create_project_html_page():
     page_content = Div().add_style({'display': 'block'})
 
     # Create
-    create_project_div = Div(id='create-project-div')
+    create_project_div = Div(id='modify-project-div')
     create_project_div.add_element(Header(level=1, internal=f"Create, Update, or Delete Project").add_style({'margin': '20px'}))
 
     # Form
-    filter_projects_form = Form(id='create-project')
+    filter_projects_form = Form(id='modify-project')
     filter_projects_form.add_element("New Project Name:")
-    filter_projects_form.add_element(Input(type="text", id='create-project-name', name="name"))
+    filter_projects_form.add_element(Input(type="text", id='modify-project-name', name="name"))
     create_project_div.add_element(filter_projects_form)
     create_project_div.add_element(Button(
         onclick='createProject()',
@@ -26,7 +24,7 @@ def create_project_html_page():
     ))
 
     # Result
-    create_result_div = Div(id='create-project-result')
+    create_result_div = Div(id='modify-project-result')
     create_project_div.add_element(create_result_div)
     page_content.add_element(create_project_div)
 
@@ -100,7 +98,7 @@ def filter_projects_html_page():
     # Form
     filter_projects_form = Form(id='filter-projects')
     filter_projects_form.add_element("Project Name:")
-    filter_projects_form.add_element(Input(type="text", id='delete-project-name', name="name"))
+    filter_projects_form.add_element(Input(type="text", id='project-name', name="name"))
     page_content.add_element(filter_projects_form)
     page_content.add_element(Button(
         onclick='populateTable()',
@@ -109,7 +107,9 @@ def filter_projects_html_page():
 
     # Create Project
     create_project_div = Div()
-    create_project_div.add_element(Link(href='/html/create-project', internal='Create, Update or Delete Project'))
+    create_project_div.add_element(Link(href='/html/modify-project', internal=Button(
+        internal='Create, Update or Delete Project',
+    )))
     page_content.add_element(create_project_div)
 
     # Table

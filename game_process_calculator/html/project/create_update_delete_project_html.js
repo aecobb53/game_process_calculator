@@ -26,7 +26,7 @@ async function filterProjectsByName(name) {
 async function createProject() {
     console.log('Creating Project');
 
-    const form = document.getElementById('create-project');
+    const form = document.getElementById('modify-project');
     const formData = new FormData(form);
 
     var object = {};
@@ -50,7 +50,7 @@ async function createProject() {
 
     // DIV
     console.log('Showing result');
-    var create_project_result_div = document.getElementById('create-project-result');
+    var create_project_result_div = document.getElementById('modify-project-result');
     create_project_result_div.innerHTML = '';
     var create_project_result_content = document.createElement('p');
 
