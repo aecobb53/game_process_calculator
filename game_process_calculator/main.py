@@ -655,7 +655,6 @@ async def visualize_workflow_html(request: Request):
         f.write(workflow_html)
     return HTMLResponse(content=workflow_html, status_code=200)
 
-
 @app.get('/html/projects')
 async def html_projects(request: Request):
     logger.debug('GET on /html/projects')
@@ -668,8 +667,20 @@ async def html_resources(request: Request):
     resource_page = filter_resources_html_page()
     return HTMLResponse(content=resource_page, status_code=200)
 
+@app.get('/html/processes')
+async def html_processes(request: Request):
+    logger.debug(f'GET on /html/processes')
+    project_page = unimplemented_page()
+    return HTMLResponse(content=project_page, status_code=501)
+
+@app.get('/html/workflows')
+async def html_workflows(request: Request):
+    logger.debug(f'GET on /html/workflows')
+    project_page = unimplemented_page()
+    return HTMLResponse(content=project_page, status_code=501)
+
 @app.get('/html/project/{project_uid}')
-async def html_projects(request: Request, project_uid: str):
+async def html_project_project_uid(request: Request, project_uid: str):
     logger.debug(f'GET on /html/project/{project_uid}')
     data_handler = DataHandler()
     try:
@@ -686,23 +697,47 @@ async def html_projects(request: Request, project_uid: str):
     project_page = find_project_html_page(project=project)
     return HTMLResponse(content=project_page, status_code=200)
 
+@app.get('/html/resources/{resource_uid}')
+async def html_resource_resource_uid(request: Request, resource_uid: str):
+    logger.debug(f'GET on /html/resources/{resource_uid}')
+    project_page = unimplemented_page()
+    return HTMLResponse(content=project_page, status_code=501)
+
+@app.get('/html/processes/{processes_uid}')
+async def html_processes_processes_uid(request: Request, processes_uid: str):
+    logger.debug(f'GET on /html/processes/{processes_uid}')
+    project_page = unimplemented_page()
+    return HTMLResponse(content=project_page, status_code=501)
+
+@app.get('/html/workflows/{workflow_uid}')
+async def html_workflow_workflow_uid(request: Request, workflow_uid: str):
+    logger.debug(f'GET on /html/workflows/{workflow_uid}')
+    project_page = unimplemented_page()
+    return HTMLResponse(content=project_page, status_code=501)
+
 @app.get('/html/modify-project')
-async def modify_html_projects(request: Request):
+async def html_modify_project(request: Request):
     logger.debug(f'GET on /html/modify-project')
     project_page = create_project_html_page()
     return HTMLResponse(content=project_page, status_code=200)
 
-@app.get('/html/processes')
-async def modify_html_projects(request: Request):
-    logger.debug(f'GET on /html/modify-project')
+@app.get('/html/modify-resource')
+async def html_modify_resource(request: Request):
+    logger.debug(f'GET on /html/modify-resource')
     project_page = unimplemented_page()
-    return HTMLResponse(content=project_page, status_code=200)
+    return HTMLResponse(content=project_page, status_code=501)
 
-@app.get('/html/workflows')
-async def modify_html_projects(request: Request):
-    logger.debug(f'GET on /html/modify-project')
+@app.get('/html/modify-processes')
+async def html_modify_processes(request: Request):
+    logger.debug(f'GET on /html/modify-processes')
     project_page = unimplemented_page()
-    return HTMLResponse(content=project_page, status_code=200)
+    return HTMLResponse(content=project_page, status_code=501)
+
+@app.get('/html/modify-workflow')
+async def html_modify_workflow(request: Request):
+    logger.debug(f'GET on /html/modify-workflow')
+    project_page = unimplemented_page()
+    return HTMLResponse(content=project_page, status_code=501)
 
 
 # filter_resources_html_page

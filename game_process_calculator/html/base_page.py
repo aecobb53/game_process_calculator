@@ -39,7 +39,23 @@ def project_base_page():
         HtmlListItem(Link(internal='Resources List', href=f'{service_url}/html/resources')))
     toc_div.add_element(toc_resources_url_list)
 
+    # Processes
+    toc_div.add_element(Header(level=2, internal=f"Processes").add_style({'margin': '20px'}))
+    toc_processes_url_list = HtmlList(ordered=False).add_style({'margin': '20px', 'background-color': 'white'})
+    toc_processes_url_list.add_element(
+        HtmlListItem(Link(internal='Create, Update, or Delete Process', href=f'{service_url}/html/modify-process')))
+    toc_processes_url_list.add_element(
+        HtmlListItem(Link(internal='Processes List', href=f'{service_url}/html/processes')))
+    toc_div.add_element(toc_processes_url_list)
 
+    # Workflows
+    toc_div.add_element(Header(level=2, internal=f"Workflows").add_style({'margin': '20px'}))
+    toc_workflows_url_list = HtmlList(ordered=False).add_style({'margin': '20px', 'background-color': 'white'})
+    toc_workflows_url_list.add_element(
+        HtmlListItem(Link(internal='Create, Update, or Delete Workflow', href=f'{service_url}/html/modify-workflow')))
+    toc_workflows_url_list.add_element(
+        HtmlListItem(Link(internal='Workflows List', href=f'{service_url}/html/workflows')))
+    toc_div.add_element(toc_workflows_url_list)
 
     page_content.add_element(toc_div)
 
