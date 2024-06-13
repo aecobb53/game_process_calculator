@@ -26,7 +26,7 @@ from models import (
     ResponseTypes)
 from handlers import ProjectHandler, ResourceHandler, ProcessHandler, WorkflowHandler, DataHandler
 from utils import parse_query_params, parse_header, MissingRecordException, DuplicateRecordsException
-from html import WorkflowDisplay, create_project_html_page, filter_projects_html_page, filter_resources_html_page, find_project_html_page, project_base_page
+from html import WorkflowDisplay, create_project_html_page, filter_projects_html_page, filter_resources_html_page, find_project_html_page, project_base_page, unimplemented_page
 
 
 from my_base_html_lib import MyBaseDocument, NavigationContent, SidebarContent, BodyContent, FooterContent
@@ -692,7 +692,21 @@ async def modify_html_projects(request: Request):
     project_page = create_project_html_page()
     return HTMLResponse(content=project_page, status_code=200)
 
-filter_resources_html_page
+@app.get('/html/processes')
+async def modify_html_projects(request: Request):
+    logger.debug(f'GET on /html/modify-project')
+    project_page = unimplemented_page()
+    return HTMLResponse(content=project_page, status_code=200)
+
+@app.get('/html/workflows')
+async def modify_html_projects(request: Request):
+    logger.debug(f'GET on /html/modify-project')
+    project_page = unimplemented_page()
+    return HTMLResponse(content=project_page, status_code=200)
+
+
+# filter_resources_html_page
+# unimplemented_page
 """
 HTML endpoints
 /
