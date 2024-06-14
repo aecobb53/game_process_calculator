@@ -697,21 +697,21 @@ async def html_project_project_uid(request: Request, project_uid: str):
     project_page = find_project_html_page(project=project)
     return HTMLResponse(content=project_page, status_code=200)
 
-@app.get('/html/resources/{resource_uid}')
+@app.get('/html/resource/{resource_uid}')
 async def html_resource_resource_uid(request: Request, resource_uid: str):
-    logger.debug(f'GET on /html/resources/{resource_uid}')
+    logger.debug(f'GET on /html/resource/{resource_uid}')
     project_page = unimplemented_page()
     return HTMLResponse(content=project_page, status_code=501)
 
-@app.get('/html/processes/{processes_uid}')
+@app.get('/html/processe/{processes_uid}')
 async def html_processes_processes_uid(request: Request, processes_uid: str):
-    logger.debug(f'GET on /html/processes/{processes_uid}')
+    logger.debug(f'GET on /html/processe/{processes_uid}')
     project_page = unimplemented_page()
     return HTMLResponse(content=project_page, status_code=501)
 
-@app.get('/html/workflows/{workflow_uid}')
+@app.get('/html/workflow/{workflow_uid}')
 async def html_workflow_workflow_uid(request: Request, workflow_uid: str):
-    logger.debug(f'GET on /html/workflows/{workflow_uid}')
+    logger.debug(f'GET on /html/workflow/{workflow_uid}')
     project_page = unimplemented_page()
     return HTMLResponse(content=project_page, status_code=501)
 
