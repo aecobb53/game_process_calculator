@@ -10,7 +10,7 @@ class FactorioDataItemBase(BaseModel):
     name: str
     localised_name: List
     project_uid: str
-    notes: str | None = None
+    notes: List[str] | None = None
 
     def return_base_record(self):
         content = {
@@ -77,6 +77,7 @@ class FactorioDataItem(FactorioDataItemBase):
             'project_uid',
             'filename',
             'name',
+            'notes',
             'localised_name',
             'type',
             'order',
@@ -147,8 +148,8 @@ class FactorioDataMachine(FactorioDataItemBase):
     crafting_categories: Dict | None = None
     module_inventory_size: int | None = None
     allowed_effects: Dict | None = None
-    friendly_map_color: Dict
-    enemy_map_color: Dict
+    friendly_map_color: Dict | None = None
+    enemy_map_color: Dict | None = None
     energy_source: EnergySource
     pollution: float
     max_energy_usage: int | None = None
@@ -185,6 +186,7 @@ class FactorioDataMachine(FactorioDataItemBase):
             'project_uid',
             'filename',
             'name',
+            'notes',
             'localised_name',
             'type',
             'energy_usage',
@@ -272,6 +274,7 @@ class FactorioDataLogistics(FactorioDataItemBase):
             'project_uid',
             'filename',
             'name',
+            'notes',
             'localised_name',
             'max_energy_usage',
             'inserter_extension_speed',
@@ -315,6 +318,7 @@ class MineableProducts(BaseModel):
             'type',
             'name',
             'probability',
+            'notes',
             'amount',
         ]
         missing_keys = []
@@ -349,6 +353,7 @@ class MineableProperties(BaseModel):
             'minable',
             'mining_time',
             'products',
+            'notes',
             'mining_particle',
             'fluid_amount',
             'required_fluid',
@@ -402,6 +407,7 @@ class FactorioDataResource(FactorioDataItemBase):
             'project_uid',
             'filename',
             'name',
+            'notes',
             'localised_name',
             'resource_category',
             'mineable_properties',
@@ -460,6 +466,7 @@ class Ingredient(BaseModel):
             'project_uid',
             'type',
             'name',
+            'notes',
             'probability',
             'amount',
             'catalyst_amount',
@@ -525,6 +532,7 @@ class FactorioDataRecipe(FactorioDataItemBase):
             'project_uid',
             'filename',
             'name',
+            'notes',
             'localised_name',
             'category',
             'order',
