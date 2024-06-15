@@ -2,17 +2,41 @@ import os
 import json
 import re
 
-from typing import List
+from typing import List, Dict
 from copy import deepcopy
+from datetime import datetime, timedelta
 
-from factorio_data_objects import FactorioDataItem, FactorioDataMachine, FactorioDataLogistics, FactorioDataResource, FactorioDataRecipe
+from factorio_data_objects import (
+    FactorioDataItem,
+    FactorioDataMachine,
+    FactorioDataLogistics,
+    FactorioDataResource,
+    FactorioDataRecipe)
+from rest_data_loader import RestDataLoader
 
 factorio_recipie_lister_path = '/mnt/c/Users/aecob/AppData/Roaming/Factorio/script-output/recipe-lister'
 # print(os.path.exists(factorio_recipie_lister_path))
 # for i in os.listdir(factorio_recipie_lister_path):
 #     print(i)
 
-project_uid = '2579ad75-87c0-4152-9bd3-90768dbd2778'
+any_rest_calls = True
+upload_data = True
+timer_start_time = datetime.now()
+print(f"Starting upload: {timer_start_time}")
+
+if any_rest_calls:
+    rdl = RestDataLoader()
+    resp = rdl.get_project(params={'name':'Factorio'})
+    if resp.json()['projects']:
+        project_uid = resp.json()['projects'][0]['uid']
+    else:
+        if upload_data:
+            resp = rdl.post_project(json={'name':'Factorio'})
+            project_uid = resp.json()['uid']
+        else:
+            project_uid = 'edf22127-6a1a-4f0b-bafb-2c0ba208cf68'
+else:
+    project_uid = 'edf22127-6a1a-4f0b-bafb-2c0ba208cf68'
 
 # ITEMS
 item_file_list = [
@@ -32,7 +56,7 @@ for fl in item_file_list:
                 value['project_uid'] = project_uid
                 obj = FactorioDataItem.model_validate(value)
                 item_objects.append(obj)
-                obj.json_out()
+                # obj.json_out()
             except Exception as e:
                 print(f"Error: {e}")
                 print('ITEM')
@@ -63,8 +87,8 @@ for fl in machine_file_list:
         index = 0
         for key, value in machine.items():
             value['filename'] = fl
+            value['project_uid'] = project_uid
             try:
-                value['project_uid'] = project_uid
                 obj = FactorioDataMachine.model_validate(value)
                 machine_objects.append(obj)
                 obj.json_out()
@@ -77,6 +101,20 @@ for fl in machine_file_list:
                 print(f"Index: {index}")
                 break
             index += 1
+machine_objects.append(FactorioDataMachine(
+    filename="assembling-machine.json",
+    name="angels-manual-crafting",
+    localised_name=[],
+    notes=['Added manually to populate script'],
+    project_uid=project_uid,
+    type="manual-crafting",
+    energy_usage=0,
+    crafting_speed=1.0,
+    crafting_categories={
+        "angels-manual-crafting": True
+    },
+    energy_source={},
+    pollution=0.0,))
 
 
 # INFRASTRUCTURE
@@ -117,24 +155,6 @@ for fl in resource_file_list:
         machine = json.load(f)
         index = 0
         for key, value in machine.items():
-
-            # print(f"{value['autoplace_specification'].keys()}")
-            # for k, v  in value['autoplace_specification'].items():
-            #     if isinstance(v, dict):
-            #         print(f"K: [{k}], TYPE: [{type(v)}]")
-            #         for k2, v2 in v.items():
-            #             if isinstance(v2, dict):
-            #                 print(f"K2: [{k2}], TYPE: [{type(v2)}]")
-            #             elif isinstance(v2, list):
-            #                 print(f"K2: [{k2}], LEN: [{len(v2)}]")
-            #             else:
-            #                 print(f"K2: [{k2}], V2: [{v2}]")
-            #             # print(f"K2: [{k2}], V2: [{type(v2)}]")
-            #     # else:
-            #     #     print(f"K: [{k}], V: [{v}]")
-            # exit()
-
-
             value['filename'] = fl
             try:
                 value['project_uid'] = project_uid
@@ -188,10 +208,16 @@ for fl in recipe_file_list:
 
 
 
-def find_item_by_name(name: str, item_objects: List[FactorioDataItem]) -> FactorioDataItem:
+def find_item_by_name(name: str, item_objects: List[FactorioDataItem | Dict]) -> FactorioDataItem:
     for index, item in enumerate(item_objects):
-        if item.name == name:
-            return index, item
+        if isinstance(item, dict):
+            if item['name'] == name:
+                return item
+                # return index, item
+        else:
+            if item.name == name:
+                return item
+                # return index, item
 
 def find_machine_by_crafting_category(target_crafting_category: str, machine_objects: List[FactorioDataMachine]) -> List[FactorioDataMachine]:
     machines = []
@@ -213,25 +239,56 @@ print(f"recipe_objects: [{len(recipe_objects)}]")
 uploaded_resources = []
 uploaded_processes = []
 
-# Set up a value uid
+failed_upload_resources = []
+failed_upload_processes = []
 
-for item in item_objects:
+any_rest_calls = True
+print(f"UPLOADING ITEMS: [{len(item_objects)}]")
+logging_interval = len(item_objects) // 10 + 1
+for index, item in enumerate(item_objects):
     # Mock Post
-    item.notes = f"Uploaded from script."
+    item.notes = [f"Uploaded from script."]
+
     payload = item.return_resource()
-    item.resource_uid = 'GPC_RESOURCE_UID'
+    if any_rest_calls:
+        resp = rdl.get_resource(params={'name': item.name, 'project_uid': project_uid})
+        if len(resp.json()['resources']) == 0:
+            if upload_data:
+                resp = rdl.post_resource(json=payload)
+                item.resource_uid = resp.json()['uid']
+        elif len(resp.json()['resources']) == 1:
+            if upload_data:
+                resource = resp.json()['resources'][0]
+                resp = rdl.put_resource(resource_uid=resource['uid'], json=payload)
+                item.resource_uid = resp.json()['uid']
+        else:
+            raise Exception(f"Multiple resources found for {item.name}")
+    if not item.resource_uid:
+        item.resource_uid = 'GPC_RESOURCE_UID'
 
     uploaded_resources.append(item)
     # print(json.dumps(item.json_out(), indent=4))
     # print(json.dumps(item.return_resource(), indent=4))
     # break
+    if index % logging_interval == 0:
+        print(f"Uploaded [{index}] of [{len(item_objects)}] items DONE. Or about [{index // logging_interval * 10}%]")
+print('DONE UPLOADING ITEMS')
 
-for item in resource_objects:
+any_rest_calls = True
+resources_in_project = rdl.get_resource(params={'project_uid': project_uid}).json()['resources']
+print(f"UPLOADING RESOURCES: [{len(resource_objects)}]")
+logging_interval = len(resource_objects) // 10 + 1
+for index, item in enumerate(resource_objects):
     # Mock Post
-    item.notes = f"Uploaded from script."
+    item.notes = [f"Uploaded from script."]
     for product in item.mineable_properties.products:
-        index, resource_obj = find_item_by_name(product.name, item_objects)
-        item.produce_uids[resource_obj.resource_uid] = product.amount / product.probability
+        resource_obj = find_item_by_name(product.name, resources_in_project)
+        if resource_obj is None:
+            raise ValueError(f"Resource not found: {product.name}")
+        if isinstance(resource_obj, dict):
+            item.produce_uids[resource_obj['uid']] = product.amount / product.probability
+        else:
+            item.produce_uids[resource_obj.resource_uid] = product.amount / product.probability
         if product.type == 'fluid':
             item.machine_uid = 'GPC_FLUID_MACHINE_UID'
         elif product.type == 'item':
@@ -239,45 +296,44 @@ for item in resource_objects:
         else:
             print('NOT MAPPED ITEM!!')
             exit()
+
     payload = item.return_process()
-    item.process_uid = 'GPC_PROCESS_UID'
+    if any_rest_calls:
+        resp = rdl.get_process(params={'name': item.name, 'project_uid': project_uid})
+        if len (resp.json()['processes']) == 0:
+            if upload_data:
+                resp = rdl.post_process(json=payload)
+                item.process_uid = resp.json()['uid']
+        elif len (resp.json()['processes']) == 1:
+            if upload_data:
+                process = resp.json()['processes'][0]
+                resp = rdl.put_process(process_uid=process['uid'], json=payload)
+                item.process_uid = resp.json()['uid']
+        else:
+            raise Exception(f"Multiple processes found for {item.name}")
+
+    if not item.process_uid:
+        item.process_uid = 'GPC_PROCESS_UID'
+
     uploaded_processes.append(item)
 
     # print(json.dumps(item.return_process(), indent=4))
     # break
+    if index % logging_interval == 0:
+        print(f"Uploaded [{index}] of [{len(resource_objects)}] items DONE. Or about [{index // logging_interval * 10}%]")
+print('DONE UPLOADING RESOURCES')
 
-for item in recipe_objects:
-    # Mock Post
-    # item.notes = f"Uploaded from script."
-    # # Consumes
-    # if item.ingredients:
-    #     for ingredient in item.ingredients:
-    #         if ingredient.amount is None:
-    #             continue
-    #         index, resource_obj = find_item_by_name(ingredient.name, item_objects)
-    #         probability = ingredient.probability if ingredient.probability else 1
-    #         item.consume_uids[resource_obj.resource_uid] = ingredient.amount / probability
-    # # Produces
-    # if item.products:
-    #     for product in item.products:
-    #         if product.amount is None:
-    #             continue
-    #         index, resource_obj = find_item_by_name(product.name, item_objects)
-    #         probability = product.probability if product.probability else 1
-    #         item.produce_uids[resource_obj.resource_uid] = product.amount / probability
-
-
-
-    # print(json.dumps(item.json_out(), indent=4))
-    # print(json.dumps(item.return_process(), indent=4))
+any_rest_calls = True
+resources_in_project = rdl.get_resource(params={'project_uid': project_uid}).json()['resources']
+print(f"UPLOADING RECIPES: [{len(recipe_objects)}]")
+logging_interval = len(recipe_objects) // 10 + 1
+for index, item in enumerate(recipe_objects):
     machines = find_machine_by_crafting_category(item.category, machine_objects)
     for machine in machines:
-        item.notes = f"Uploaded from script."
-        # print(json.dumps(machine.json_out(), indent=4))
-        # new_item = FactorioDataRecipe.model_validate(item)
+        item.notes = [f"Uploaded from script."]
         new_item = deepcopy(item)
         new_item.name = f"{item.name}::{machine.name}"
-        new_item.notes += f" For machine [{machine.name}]"
+        new_item.notes.append(f"For machine [{machine.name}]")
         mock_machine_uid = f'GPC_MACHINE_UID-{machine.name}'
         new_item.machine_uid = mock_machine_uid
 
@@ -293,25 +349,64 @@ for item in recipe_objects:
             for ingredient in new_item.ingredients:
                 if ingredient.amount is None:
                     continue
-                index, resource_obj = find_item_by_name(ingredient.name, item_objects)
+                resource_obj = find_item_by_name(ingredient.name, resources_in_project)
                 probability = ingredient.probability if ingredient.probability else 1
                 general_amount = ingredient.amount / probability
                 general_speed = 1 / machine.crafting_speed
-                new_item.consume_uids[resource_obj.resource_uid] = general_amount
+                if isinstance(resource_obj, dict):
+                    new_item.consume_uids[resource_obj['uid']] = general_amount
+                else:
+                    new_item.consume_uids[resource_obj.resource_uid] = general_amount
                 new_item.process_time_seconds = general_speed
         # Produces
         if new_item.products:
             for product in new_item.products:
                 if product.amount is None:
                     continue
-                index, resource_obj = find_item_by_name(product.name, item_objects)
+                resource_obj = find_item_by_name(product.name, resources_in_project)
                 probability = product.probability if product.probability else 1
                 general_amount = product.amount / probability
                 general_speed = 1 / machine.crafting_speed
-                new_item.produce_uids[resource_obj.resource_uid] = general_amount
+                if isinstance(resource_obj, dict):
+                    new_item.produce_uids[resource_obj['uid']] = general_amount
+                else:
+                    new_item.produce_uids[resource_obj.resource_uid] = general_amount
                 new_item.process_time_seconds = general_speed
+        # print(json.dumps(new_item.json_out(), indent=4))
+        # print(json.dumps(new_item.return_process(), indent=4))
+        # exit()
+
+        payload = new_item.return_process()
+        if any_rest_calls:
+            resp = rdl.get_process(params={'name': new_item.name, 'project_uid': project_uid})
+            if len (resp.json()['processes']) == 0:
+                if upload_data:
+                    resp = rdl.post_process(json=payload)
+                    new_item.process_uid = resp.json()['uid']
+            elif len (resp.json()['processes']) == 1:
+                if upload_data:
+                    process = resp.json()['processes'][0]
+                    resp = rdl.put_process(process_uid=process['uid'], json=payload)
+                    new_item.process_uid = resp.json()['uid']
+            else:
+                raise Exception(f"Multiple processes found for {new_item.name}")
+
+        if not item.process_uid:
+            item.process_uid = 'GPC_PROCESS_UID'
+
         uploaded_processes.append(new_item)
+    if not machines:
+        print(json.dumps(item.json_out(), indent=4))
+        print(json.dumps(item.return_process(), indent=4))
+        raise ValueError(f"No machines found for {item.name}")
+    if index % logging_interval == 0:
+        print(f"Uploaded [{index}] of [{len(recipe_objects)}] items DONE. Or about [{index // logging_interval * 10}%]")
+print('DONE UPLOADING RECIPES')
+
 
 print(f"uploaded_resources: [{len(uploaded_resources)}]")
 print(f"uploaded_processes: [{len(uploaded_processes)}]")
 
+timer_stop_time = datetime.now()
+print(f"Finished Upload: {timer_stop_time}")
+print(f"Total Time: {timer_stop_time - timer_start_time}")
