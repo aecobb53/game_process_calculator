@@ -4,6 +4,7 @@ requests
 # websocket
 # websockets
 pyyaml
+sqlmodel
 
 # Daemon
 uvicorn
