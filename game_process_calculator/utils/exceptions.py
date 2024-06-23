@@ -4,3 +4,7 @@ class MissingRecordException(Exception):
 
 class DuplicateRecordsException(Exception):
     pass
+
+
+class DataIntegrityException(Exception):
+    pass

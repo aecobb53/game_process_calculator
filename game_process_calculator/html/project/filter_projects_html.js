@@ -10,7 +10,7 @@ async function filterProjects() {
     const params = new URLSearchParams(formData);
     console.log('params: ' + params.toString());
 
-    url = service_url + "/projects?" + params;
+    url = service_url + "/project?" + params;
     console.log('url: ' + url);
 
     const response = await fetch(url, {
@@ -30,7 +30,7 @@ async function filterResources(project_uid) {
 
     params = new URLSearchParams({project_uid: project_uid});
 
-    url = service_url + "/resources?" + params;
+    url = service_url + "/resource?" + params;
     console.log('url: ' + url);
 
     const response = await fetch(url, {
@@ -50,7 +50,7 @@ async function filterProcesses(project_uid) {
 
     params = new URLSearchParams({project_uid: project_uid});
 
-    url = service_url + "/processes?" + params;
+    url = service_url + "/process?" + params;
     console.log('ur;: ' + url);
 
     const response = await fetch(url, {
@@ -70,7 +70,7 @@ async function filterWorkflows(project_uid) {
 
     params = new URLSearchParams({project_uid: project_uid});
 
-    url = service_url + "/workflows?" + params;
+    url = service_url + "/workflow?" + params;
     console.log('url' + url);
 
     const response = await fetch(url, {

@@ -1,3 +1,5 @@
-mkdir data
-mkdir test/test_data
-mkdir logs
+# mkdir data
+# mkdir test/test_data
+# mkdir logs
+
+

@@ -1,17 +1,79 @@
 version: '3'
 
 services:
-    game_process_calculator:
-        build:
-            context: .
-            dockerfile: Dockerfile
-        container_name: game_process_calculator
-        restart: always
+    db:
+        image: postgres:13
+        environment:
+            POSTGRES_USER: example
+            POSTGRES_PASSWORD: example
+            POSTGRES_DB: example_db
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+
+    app:
+        build: .
+        depends_on:
+            - db
+        environment:
+            DATABASE_URL: postgresql://example:example@db:5432/example_db
+            LOGICAL_ENV: ${LOGICAL_ENV}
+            SERVICE_URL: ${GAME_PROCESS_CALCULATOR_SERVICE_URL}
+            PYTHONUNBUFFERED: 1
         command: bash etc/entrypoint.sh
         volumes:
-            - .:/usr/src
+            - .:/app
         ports:
             - 8203:8000
-        environment:
-            - LOGICAL_ENV=${LOGICAL_ENV}
-            - SERVICE_URL=${GAME_PROCESS_CALCULATOR_SERVICE_URL}
+        links:
+            - db
+
+volumes:
+  postgres_data:
+
+
+# version: '3'
+
+# services:
+#     game_process_calculator:
+#         build:
+#             context: .
+#             dockerfile: Dockerfile
+#         container_name: game_process_calculator
+#         restart: always
+#         command: bash etc/entrypoint.sh
+#         volumes:
+#             - .:/usr/src
+#         ports:
+#             - 8203:8000
+#             - 5432:5432
+#         environment:
+#             - LOGICAL_ENV=${LOGICAL_ENV}
+#             - SERVICE_URL=${GAME_PROCESS_CALCULATOR_SERVICE_URL}
+#             - DATABASE_URL=postgresql+psycopg2://postgres:mysecretpassword@localhost:5432
+        # depends_on:
+        #     - db
+#     db:
+#         image: postgres
+#         # restart: always
+#         expose:
+#             - 5432
+#         # ports:
+#         #     - 5432:5432
+#         #     # - 5430:5432
+#         volumes:
+#             - my_pg_v:/var/lib/postgresql/data/
+#         environment:
+#             - POSTGRES_DB=mydb
+#             - POSTGRES_PASSWORD=mypass
+#             - POSTGRES_USER=myuser
+
+# volumes:
+#   my_pg_v:
+
+# postgres://myuser:mypass@localhost:5430/mydb
+
+# networks:
+#   default:
+#     name: my_custom_network

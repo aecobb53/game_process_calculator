@@ -9,7 +9,7 @@ async function filterResources() {
 
     params = new URLSearchParams({project_uid: project_uid});
 
-    url = service_url + "/resources?" + params;
+    url = service_url + "/resource?" + params;
     console.log('url' + url);
 
     const response = await fetch(url, {
@@ -29,7 +29,7 @@ async function filterProcesses() {
 
     params = new URLSearchParams({project_uid: project_uid});
 
-    url = service_url + "/processes?" + params;
+    url = service_url + "/process?" + params;
     console.log('url' + url);
 
     const response = await fetch(url, {
@@ -49,7 +49,7 @@ async function filterWorkflows() {
 
     params = new URLSearchParams({project_uid: project_uid});
 
-    url = service_url + "/workflows?" + params;
+    url = service_url + "/workflow?" + params;
     console.log('url' + url);
 
     const response = await fetch(url, {

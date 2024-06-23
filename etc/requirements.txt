@@ -5,6 +5,8 @@ requests
 # websockets
 pyyaml
 sqlmodel
+psycopg2-binary
+
 
 # Daemon
 uvicorn

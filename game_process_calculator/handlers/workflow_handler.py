@@ -1,93 +1,289 @@
-import json
-import re
-import os
-import requests
+from datetime import datetime
+from enum import Enum
+from sqlmodel import Session, select
 
+from .base_handler import BaseHandler
 from copy import deepcopy
-from typing import List, Optional, Dict, Union
-
-# from handlers import BaseDatabaseInteractor
-from handlers import BaseHandler
-from models import Workflow, WorkflowFilter
+from models import (TagFilter,
+    ProcessFilter,
+    Workflow,
+    WorkflowDBCreate,
+    WorkflowDBRead,
+    WorkflowDB,
+    WorkflowFilter,)
+from utils import DuplicateRecordsException, MissingRecordException, DataIntegrityException
+from . import ProjectHandler, TagHandler, ResourceHandler, ProcessHandler
 
 
 class WorkflowHandler(BaseHandler):
-    save_filename: Optional[str] = None
-    _workflows: Optional[List[Workflow]] = None
-
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.save_filename = 'workflows.json'
-        self._workflows = None
+    async def create_workflow(self, workflow: Workflow) -> Workflow:
+        self.context.logger.debug(f"Creating workflow: [{workflow.uid}] for project: [{workflow.project_uid}]")
 
-    @property
-    def workflows(self) -> List[Workflow]:
-        if self._workflows is None:
-            self.load()
-        return self._workflows
+        # Validate allowed create Workflow
+        await self.validate_can_create_workflow(workflow=workflow)
+        ph = ProjectHandler()
+        th = TagHandler()
+        rh = ResourceHandler()
+        prh = ProcessHandler()
 
-    @property
-    def save_file_path(self) -> str:
-        return os.path.join(self.save_dir, self.save_filename)
+        with Session(self.context.database.engine) as session:
+            create_obj = WorkflowDBCreate.model_validate(workflow)
+            create_obj = WorkflowDB.model_validate(create_obj)
+            session.add(create_obj)
+            session.commit()
+            session.refresh(create_obj)
+            read_obj = WorkflowDBRead.model_validate(create_obj)
+            workflow = read_obj.return_data_obj()
 
-    def load(self) -> None:
-        if os.path.exists(self.save_file_path):
-            data = [Workflow.build(w) for w in self.load_file(self.save_file_path)]
-        else:
-            data = []
-        self._workflows = data
+            workflow.project = await ph.find_project(workflow.project_uid)
+            if workflow.tag_uids:
+                workflow.tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids))
+            if workflow.focus_resource_uid:
+                workflow.focus_resource = await rh.find_resource(workflow.focus_resource_uid)
+            if workflow.process_uids:
+                workflow.processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids))
 
-    def save(self) -> None:
-        os.makedirs(self.save_dir, exist_ok=True)
-        content = [p.put() for p in self.workflows]
-        self.save_file(self.save_file_path, content)
+        self.context.logger.info(f"Created workflow: [{workflow.uid}]")
+        return workflow
 
-    def create(self, workflow: Workflow) -> Workflow:
-        workflows = self.workflows
-        new_workflow = Workflow.build(workflow.put())
-        new_workflow.id = len(workflows)
-        workflows.append(new_workflow)
-        self.save()
-        return new_workflow
+    async def filter_workflows(self, workflow_filter: WorkflowFilter) -> list[Workflow]:
+        self.context.logger.debug(f"Filtering workflows")
 
-    def filter(self, workflow_filter: WorkflowFilter) -> List[Workflow]:
-        workflows = self.workflows
-        workflows = workflow_filter.filter_results(workflows)
+        ph = ProjectHandler()
+        th = TagHandler()
+        rh = ResourceHandler()
+        prh = ProcessHandler()
+
+        with Session(self.context.database.engine) as session:
+            query = select(WorkflowDB)
+            query = workflow_filter.apply_filters(WorkflowDB, query)
+            rows = session.exec(query).all()
+            workflows = []
+            for row in rows:
+                read_obj = WorkflowDBRead.model_validate(row)
+                workflow = read_obj.return_data_obj()
+
+                workflow.project = await ph.find_project(workflow.project_uid)
+                if workflow.tag_uids:
+                    workflow.tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids))
+                if workflow.focus_resource_uid:
+                    workflow.focus_resource = await rh.find_resource(workflow.focus_resource_uid)
+                if workflow.process_uids:
+                    workflow.processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids))
+
+                workflows.append(workflow)
+        self.context.logger.debug(f"Filter workflows found [{len(workflows)}]")
         return workflows
 
-    def update(self, saved_wrokflow: Workflow, workflow: Workflow) -> Workflow:
-        saved_wrokflow.update(workflow)
-        self.workflows[saved_wrokflow.id] = saved_wrokflow
-        self.save()
-        return deepcopy(workflow)
+    async def find_workflow(self, workflow_uid: str) -> Workflow:
+        self.context.logger.debug(f"Find workflow: [{workflow_uid}]")
 
-    def delete(self, workflow: Workflow) -> Workflow:
-        workflow.delete()
-        self.workflows[workflow.id] = workflow
-        self.save()
-        return deepcopy(workflow)
+        ph = ProjectHandler()
+        th = TagHandler()
+        rh = ResourceHandler()
+        prh = ProcessHandler()
 
-    def export_workflows(self) -> Dict:
-        workflows = self.filter(WorkflowFilter())
-        return {'workflows': [p.put() for p in workflows]}
+        with Session(self.context.database.engine) as session:
+            query = select(WorkflowDB)
+            query = query.where(WorkflowDB.uid == workflow_uid)
+            row = session.exec(query).first()
+            if row is None:
+                raise MissingRecordException(f"No workflow found with uid: {workflow_uid}")
+            read_obj = WorkflowDBRead.model_validate(row)
+            workflow = read_obj.return_data_obj()
 
-    def import_workflows(self, dct) -> List[Workflow]:
-        self._workflows = []
-        workflows = self.workflows
-        output = []
-        print(json.dumps(dct, indent=4))
-        for workflow_dct in dct['workflows']:
-            workflow = Workflow.build(workflow_dct)
-            output.append(workflow)
-            workflows.append(workflow)
+            workflow.project = await ph.find_project(workflow.project_uid)
+            if workflow.tag_uids:
+                workflow.tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids))
+            if workflow.focus_resource_uid:
+                workflow.focus_resource = await rh.find_resource(workflow.focus_resource_uid)
+            if workflow.process_uids:
+                workflow.processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids))
 
-        self.save()
-        return output
+        self.context.logger.debug(f"Created workflow: [{workflow.uid}]")
+        return workflow
 
-    def export_google_sheet(self) -> List[str]:
-        workflows = self.filter(WorkflowFilter())
-        output = []
-        for workflow in workflows:
-            output.append(f"{workflow.uid},{workflow.name},=SUM(1,2)")
-        return output
+    async def update_workflow(self, workflow_uid: str, workflow: Workflow) -> Workflow:
+        self.context.logger.debug(f"Updating workflow: [{workflow_uid}]")
+
+        # Validate allowed update Workflow
+        await self.validate_can_update_workflow(workflow_uid=workflow_uid, workflow=workflow)
+        ph = ProjectHandler()
+        th = TagHandler()
+        rh = ResourceHandler()
+        prh = ProcessHandler()
+
+        with Session(self.context.database.engine) as session:
+            query = select(WorkflowDB)
+            query = query.where(WorkflowDB.uid == workflow_uid)
+            row = session.exec(query).first()
+            if row is None:
+                raise MissingRecordException(f"No workflow found with uid: {workflow_uid}")
+
+            # Verify data integrity
+            immutable_fields = [
+                'uid',
+                'creation_datetime',
+            ]
+            immutable_modification_detected = []
+            for key in immutable_fields:
+                if getattr(row, key) != getattr(workflow, key):
+                    immutable_modification_detected.append(key)
+            if len(immutable_modification_detected) > 0:
+                raise DataIntegrityException(f"Immutable fields were modified: {immutable_modification_detected}")
+
+            change_log = deepcopy(row.change_log)
+
+            # Track changes
+            changes = []
+            for key in Workflow.__fields__.keys():
+                try:
+                    workflow_value = getattr(workflow, key)
+                    if isinstance(workflow_value, Enum):
+                        workflow_value = workflow_value.value
+                    if getattr(row, key) != workflow_value:
+                        changes.append(key)
+                        setattr(row, key, getattr(workflow, key))
+                except AttributeError:
+                    pass
+
+            change_log_strs = []
+            for change in changes:
+                change_log_str = f"{change}: {getattr(row, change)} -> {getattr(workflow, change)}"
+                change_log_strs.append(change_log_str)
+            change_log[datetime.strftime(datetime.utcnow(), "%Y-%m-%d %H:%M:%S")] = ';'.join(change_log_strs)
+            row.change_log = change_log
+
+            row.update_datetime = datetime.utcnow()
+            session.add(row)
+            session.commit()
+            session.refresh(row)
+            read_obj = WorkflowDBRead.model_validate(row)
+            workflow = read_obj.return_data_obj()
+
+            workflow.project = await ph.find_project(workflow.project_uid)
+            if workflow.tag_uids:
+                workflow.tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids))
+            if workflow.focus_resource_uid:
+                workflow.focus_resource = await rh.find_resource(workflow.focus_resource_uid)
+            if workflow.process_uids:
+                workflow.processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids))
+
+        self.context.logger.info(f"Updated workflow: [{workflow.uid}]")
+        return workflow
+
+    async def set_activation(self, workflow_uid: str, active_state: bool) -> Workflow:
+        self.context.logger.debug(f"Setting workflow activation: [{workflow_uid}] to [{active_state}]")
+
+        workflow = await self.find_workflow(workflow_uid=workflow_uid)
+        workflow.active = active_state
+        workflow.cascade_active = active_state
+
+        await self.update_workflow(workflow_uid=workflow_uid, workflow=workflow)
+
+        self.context.logger.info(f"Set workflow activation: [{workflow.uid}]")
+        return workflow
+
+    async def delete_workflow(self, workflow_uid: str) -> Workflow:
+        self.context.logger.debug(f"Deleting Workflow: [{workflow_uid}]")
+
+        workflow = await self.find_workflow(workflow_uid=workflow_uid)
+        workflow.deleted = True
+        workflow.cascade_deleted = True
+
+        await self.update_workflow(workflow_uid=workflow_uid, workflow=workflow)
+
+        self.context.logger.info(f"Workflow deleted: [{workflow.uid}]")
+        return workflow
+
+
+    async def validate_can_create_workflow(self, workflow: Workflow) -> None:
+        # Validate Project
+        ph = ProjectHandler()
+        project = await ph.find_project(project_uid=workflow.project_uid)
+        if workflow.project_uid != project.uid:
+            raise DataIntegrityException("Workflow project_uid does not match project_uid")
+        # Validate Tags
+        th = TagHandler()
+        if workflow.tag_uids:
+            tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids))
+            if any([t for t in workflow.tag_uids if t not in [tag.uid for tag in tags]]):
+                raise DataIntegrityException("Workflow tag_uids contain invalid tag_uids")
+        # Validate Resources
+        rh = ResourceHandler()
+        if workflow.focus_resource_uid:
+            resource = await rh.find_resource(resource_uid=workflow.focus_resource_uid)
+            if workflow.focus_resource_uid != resource.uid:
+                raise DataIntegrityException("Workflow focus_resource_uid does not match resource_uid")
+        # Validate Process
+        prh = ProcessHandler()
+        if workflow.process_uids:
+            processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids))
+            if any([p for p in workflow.process_uids if p not in [process.uid for process in processes]]):
+                raise DataIntegrityException("Workflow process_uids contain invalid process_uids")
+        workflow.project = project
+        workflow_filter = WorkflowFilter(
+            project_uid=[workflow.project.uid],
+            name=[workflow.name],
+            active=True,
+            deleted=False,
+            cascade_active=True,
+            cascade_deleted=False
+        )
+        with Session(self.context.database.engine) as session:
+            query = select(WorkflowDB)
+            query = workflow_filter.apply_filters(WorkflowDB, query)
+            rows = session.exec(query).all()
+            if rows:
+                raise DuplicateRecordsException(f"Workflow with name [{workflow.name}] already exists")
+
+    async def validate_can_update_workflow(self, workflow_uid: str, workflow: Workflow) -> None:
+        # Validate Project
+        ph = ProjectHandler()
+        project = await ph.find_project(project_uid=workflow.project_uid)
+        if workflow.project_uid != project.uid:
+            raise DataIntegrityException("Workflow project_uid does not match project_uid")
+        # Validate Tags
+        th = TagHandler()
+        if workflow.tag_uids:
+            tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids))
+            if any([t for t in workflow.tag_uids if t not in [tag.uid for tag in tags]]):
+                raise DataIntegrityException("Workflow tag_uids contain invalid tag_uids")
+        # Validate Resources
+        rh = ResourceHandler()
+        if workflow.focus_resource_uid:
+            resource = await rh.find_resource(resource_uid=workflow.focus_resource_uid)
+            if workflow.focus_resource_uid != resource.uid:
+                raise DataIntegrityException("Workflow focus_resource_uid does not match resource_uid")
+        # Validate Process
+        prh = ProcessHandler()
+        if workflow.process_uids:
+            processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids))
+            if any([p for p in workflow.process_uids if p not in [process.uid for process in processes]]):
+                raise DataIntegrityException("Workflow process_uids contain invalid process_uids")
+        workflow.project = project
+        workflow_filter = WorkflowFilter(
+            name=[workflow.name],
+            active=True,
+            deleted=False,
+            cascade_active=True,
+            cascade_deleted=False
+        )
+        with Session(self.context.database.engine) as session:
+            query = select(WorkflowDB)
+            query = workflow_filter.apply_filters(WorkflowDB, query)
+            rows = session.exec(query).all()
+            """
+            if rows == 0 there are no records with the name and you can update
+            if rows == 1 and the uuids match its fine
+            if rows == 1 and the uuids do not match error
+            if rows > 1 error
+            """
+            if len(rows) == 1:
+                if rows[0].uid != workflow_uid:
+                    raise DuplicateRecordsException(f"Workflow with name [{workflow.name}] already exists")
+            elif len(rows) > 1:
+                raise DuplicateRecordsException(f"Workflow with name [{workflow.name}] already exists")

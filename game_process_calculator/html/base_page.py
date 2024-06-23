@@ -25,9 +25,9 @@ def project_base_page():
     toc_div.add_element(Header(level=2, internal=f"Projects").add_style({'margin': '20px'}))
     toc_projects_url_list = HtmlList(ordered=False).add_style({'margin': '20px', 'background-color': 'white'})
     toc_projects_url_list.add_element(
-        HtmlListItem(Link(internal='Create, Update, or Delete Project', href=f'{service_url}/html/modify-project')))
+        HtmlListItem(Link(internal='Create, Update, or Delete Project', href=f'{service_url}/html/project/modify')))
     toc_projects_url_list.add_element(
-        HtmlListItem(Link(internal='Projects List', href=f'{service_url}/html/projects')))
+        HtmlListItem(Link(internal='Projects List', href=f'{service_url}/html/project')))
     toc_div.add_element(toc_projects_url_list)
 
     # Resources

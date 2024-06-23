@@ -107,7 +107,7 @@ def filter_projects_html_page():
 
     # Create Project
     create_project_div = Div()
-    create_project_div.add_element(Link(href='/html/modify-project', internal=Button(
+    create_project_div.add_element(Link(href='/html/project/modify', internal=Button(
         internal='Create, Update or Delete Project',
     )))
     page_content.add_element(create_project_div)

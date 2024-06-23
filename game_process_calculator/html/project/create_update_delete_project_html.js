@@ -8,7 +8,7 @@ async function filterProjectsByName(name) {
     const params = new URLSearchParams({'name': name});
     console.log('params: ' + params.toString());
 
-    url = service_url + "/projects?" + params;
+    url = service_url + "/project?" + params;
     console.log('url: ' + url);
 
     const response = await fetch(url, {
@@ -34,7 +34,7 @@ async function createProject() {
     var json = JSON.stringify(object);
     console.log('Create Project payload: ' + json);
 
-    url = service_url + "/projects";
+    url = service_url + "/project";
     console.log('url: ' + url);
 
     const response = await fetch(url, {
