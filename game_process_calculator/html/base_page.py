@@ -34,27 +34,27 @@ def project_base_page():
     toc_div.add_element(Header(level=2, internal=f"Resources").add_style({'margin': '20px'}))
     toc_resources_url_list = HtmlList(ordered=False).add_style({'margin': '20px', 'background-color': 'white'})
     toc_resources_url_list.add_element(
-        HtmlListItem(Link(internal='Create, Update, or Delete Resource', href=f'{service_url}/html/modify-resource')))
+        HtmlListItem(Link(internal='Create, Update, or Delete Resource', href=f'{service_url}/html/resource/modify')))
     toc_resources_url_list.add_element(
-        HtmlListItem(Link(internal='Resources List', href=f'{service_url}/html/resources')))
+        HtmlListItem(Link(internal='Resources List', href=f'{service_url}/html/resource')))
     toc_div.add_element(toc_resources_url_list)
 
     # Processes
     toc_div.add_element(Header(level=2, internal=f"Processes").add_style({'margin': '20px'}))
     toc_processes_url_list = HtmlList(ordered=False).add_style({'margin': '20px', 'background-color': 'white'})
     toc_processes_url_list.add_element(
-        HtmlListItem(Link(internal='Create, Update, or Delete Process', href=f'{service_url}/html/modify-process')))
+        HtmlListItem(Link(internal='Create, Update, or Delete Process', href=f'{service_url}/html/process/modify')))
     toc_processes_url_list.add_element(
-        HtmlListItem(Link(internal='Processes List', href=f'{service_url}/html/processes')))
+        HtmlListItem(Link(internal='Processes List', href=f'{service_url}/html/process')))
     toc_div.add_element(toc_processes_url_list)
 
     # Workflows
     toc_div.add_element(Header(level=2, internal=f"Workflows").add_style({'margin': '20px'}))
     toc_workflows_url_list = HtmlList(ordered=False).add_style({'margin': '20px', 'background-color': 'white'})
     toc_workflows_url_list.add_element(
-        HtmlListItem(Link(internal='Create, Update, or Delete Workflow', href=f'{service_url}/html/modify-workflow')))
+        HtmlListItem(Link(internal='Create, Update, or Delete Workflow', href=f'{service_url}/html/workflow/modify')))
     toc_workflows_url_list.add_element(
-        HtmlListItem(Link(internal='Workflows List', href=f'{service_url}/html/workflows')))
+        HtmlListItem(Link(internal='Workflows List', href=f'{service_url}/html/workflow')))
     toc_div.add_element(toc_workflows_url_list)
 
     page_content.add_element(toc_div)

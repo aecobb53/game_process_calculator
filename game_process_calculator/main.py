@@ -10,13 +10,7 @@ from models import RestHeaders, ResponseTypes
 from handlers import DatabaseHandler
 from app_files import ContextSingleton, init_logger
 from html import (project_base_page)
-# from html import (WorkflowDisplay,
-#     create_project_html_page,
-#     filter_projects_html_page,
-#     filter_resources_html_page,
-#     find_project_html_page,
-#     project_base_page,
-#     unimplemented_page)
+
 
 from my_base_html_lib import MyBaseDocument, NavigationContent, SidebarContent, BodyContent, FooterContent
 from phtml import Header, Style
@@ -29,7 +23,8 @@ from routs import (project_router,
     project_html_router,
     resource_html_router,
     process_html_router,
-    workflow_html_router,)
+    workflow_html_router,
+    html_calculator_router,)
 
 # Service Info
 with open(os.path.join(os.path.dirname(os.getcwd()), 'info.json'), 'r') as jf:
@@ -60,6 +55,7 @@ app.include_router(project_html_router)
 app.include_router(resource_html_router)
 app.include_router(process_html_router)
 app.include_router(workflow_html_router)
+app.include_router(html_calculator_router)
 
 
 @app.on_event("startup")

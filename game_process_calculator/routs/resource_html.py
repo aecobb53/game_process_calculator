@@ -7,7 +7,7 @@ from app_files import ContextSingleton
 
 from html import (
     # create_resource_html_page,
-    # filter_resources_html_page,
+    filter_resources_html_page,
     # find_resource_html_page,
     unimplemented_page
     )
@@ -22,8 +22,8 @@ router = APIRouter(
 
 @router.get('/')
 async def html_resource(request: Request):
-    project_page = unimplemented_page()
-    return HTMLResponse(content=project_page, status_code=501)
+    resource_page = filter_resources_html_page()
+    return HTMLResponse(content=resource_page, status_code=200)
 
 
 @router.get('/modify')

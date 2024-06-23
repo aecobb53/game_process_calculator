@@ -29,7 +29,7 @@ async function filterResources() {
     const params = new URLSearchParams(object);
     console.log('params: ' + params.toString());
 
-    url = service_url + "/resources?" + params;
+    url = service_url + "/resource?" + params;
     console.log('url: ' + url);
 
     const response = await fetch(url, {
@@ -51,7 +51,7 @@ async function filterProjectsByName(name) {
     const params = new URLSearchParams({'name': name});
     console.log('params: ' + params.toString());
 
-    url = service_url + "/projects?" + params;
+    url = service_url + "/project?" + params;
     console.log('url: ' + url);
 
     const response = await fetch(url, {
@@ -72,7 +72,7 @@ async function filterProjectsByUID(project_uid) {
     const params = new URLSearchParams({'uid': project_uid});
     console.log('params: ' + params.toString());
 
-    url = service_url + "/projects?" + params;
+    url = service_url + "/project?" + params;
     console.log('url: ' + url);
 
     const response = await fetch(url, {

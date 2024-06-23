@@ -8,3 +8,5 @@ from .project_html import router as project_html_router
 from .resource_html import router as resource_html_router
 from .process_html import router as process_html_router
 from .workflow_html import router as workflow_html_router
+
+from .html_calculator import router as html_calculator_router
