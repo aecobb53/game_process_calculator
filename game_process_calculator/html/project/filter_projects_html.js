@@ -29,6 +29,7 @@ async function filterResources(project_uid) {
     console.log('Filtering resources for project_uid: ' + project_uid);
 
     params = new URLSearchParams({project_uid: project_uid});
+    params.append('limit', 100000);
 
     url = service_url + "/resource?" + params;
     console.log('url: ' + url);
@@ -49,6 +50,7 @@ async function filterProcesses(project_uid) {
     console.log('Filtering processes for project_uid: ' + project_uid);
 
     params = new URLSearchParams({project_uid: project_uid});
+    params.append('limit', 100000);
 
     url = service_url + "/process?" + params;
     console.log('ur;: ' + url);
@@ -69,6 +71,7 @@ async function filterWorkflows(project_uid) {
     console.log('Filtering workflows for project_uid: ' + project_uid);
 
     params = new URLSearchParams({project_uid: project_uid});
+    params.append('limit', 100000);
 
     url = service_url + "/workflow?" + params;
     console.log('url' + url);
@@ -134,6 +137,12 @@ async function populateTable() {
         const resources_response = await filterResources(project_id=projects_array[i].uid);
         var projects_table_item = document.createElement('td');
         projects_table_item.style.padding = '1px 25px';
+        // if(resources_response.resources.length == 1000){
+        //     projects_table_item.innerHTML = resources_response.resources.length;
+        // }
+        // else{
+        //     projects_table_item.innerHTML = '1000+';
+        // }
         projects_table_item.innerHTML = resources_response.resources.length;
         projects_table_row.appendChild(projects_table_item);
 

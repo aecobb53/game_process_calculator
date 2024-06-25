@@ -14,7 +14,7 @@ class TagHandler(BaseHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    async def create_tag(self, tag: Tag) -> Tag:
+    async def create_tag(self, tag: Tag, detailed_output: bool = False) -> Tag:
         self.context.logger.debug(f"Creating tag: [{tag.uid}] for project: [{tag.project_uid}]")
 
         # Validate allowed create Tag
@@ -30,18 +30,16 @@ class TagHandler(BaseHandler):
             read_obj = TagDBRead.model_validate(create_obj)
             tag = read_obj.return_data_obj()
 
-            tag.project = await ph.find_project(tag.project_uid)
+            if detailed_output:
+                tag.project = await ph.find_project(tag.project_uid)
 
         self.context.logger.info(f"Created tag: [{tag.uid}]")
         return tag
 
-    async def filter_tags(self, tag_filter: TagFilter) -> list[Tag]:
+    async def filter_tags(self, tag_filter: TagFilter, detailed_output: bool = False) -> list[Tag]:
         self.context.logger.debug(f"Filtering tags")
 
         ph = ProjectHandler()
-
-        print(f"TAG FILTEr")
-        print(tag_filter.dict())
 
         with Session(self.context.database.engine) as session:
             query = select(TagDB)
@@ -52,13 +50,14 @@ class TagHandler(BaseHandler):
                 read_obj = TagDBRead.model_validate(row)
                 tag = read_obj.return_data_obj()
 
-                tag.project = await ph.find_project(tag.project_uid)
+                if detailed_output:
+                    tag.project = await ph.find_project(tag.project_uid)
 
                 tags.append(tag)
         self.context.logger.debug(f"Filter tags found [{len(tags)}]")
         return tags
 
-    async def find_tag(self, tag_uid: str) -> Tag:
+    async def find_tag(self, tag_uid: str, detailed_output: bool = False) -> Tag:
         self.context.logger.debug(f"Find tag: [{tag_uid}]")
 
         ph = ProjectHandler()
@@ -72,12 +71,13 @@ class TagHandler(BaseHandler):
             read_obj = TagDBRead.model_validate(row)
             tag = read_obj.return_data_obj()
 
-            tag.project = await ph.find_project(tag.project_uid)
+            if detailed_output:
+                tag.project = await ph.find_project(tag.project_uid)
 
         self.context.logger.debug(f"Tag found: [{tag.uid}]")
         return tag
 
-    async def update_tag(self, tag_uid: str, tag: Tag) -> Tag:
+    async def update_tag(self, tag_uid: str, tag: Tag, detailed_output: bool = False) -> Tag:
         self.context.logger.debug(f"Updating tag: [{tag_uid}]")
 
         # Validate allowed update Tag
@@ -116,7 +116,8 @@ class TagHandler(BaseHandler):
             read_obj = TagDBRead.model_validate(row)
             tag = read_obj.return_data_obj()
 
-            tag.project = await ph.find_project(tag.project_uid)
+            if detailed_output:
+                tag.project = await ph.find_project(tag.project_uid)
 
         self.context.logger.info(f"Updated tag: [{tag.uid}]")
         return tag
@@ -128,7 +129,7 @@ class TagHandler(BaseHandler):
         tag.active = active_state
         tag.cascade_active = active_state
 
-        await self.update_tag(tag_uid=tag_uid, tag=tag)
+        tag = await self.update_tag(tag_uid=tag_uid, tag=tag)
 
         self.context.logger.info(f"Set tag activation: [{tag.uid}]")
         return tag
@@ -140,7 +141,7 @@ class TagHandler(BaseHandler):
         tag.deleted = True
         tag.cascade_deleted = True
 
-        await self.update_tag(tag_uid=tag_uid, tag=tag)
+        tag = await self.update_tag(tag_uid=tag_uid, tag=tag)
 
         self.context.logger.info(f"Tag deleted: [{tag.uid}]")
         return tag

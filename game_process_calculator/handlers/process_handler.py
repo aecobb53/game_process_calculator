@@ -18,7 +18,7 @@ class ProcessHandler(BaseHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    async def create_process(self, process: Process) -> Process:
+    async def create_process(self, process: Process, detailed_output: bool = False) -> Process:
         self.context.logger.debug(f"Creating process: [{process.uid}] for project: [{process.project_uid}]")
 
         # Validate allowed create Process
@@ -36,20 +36,21 @@ class ProcessHandler(BaseHandler):
             read_obj = ProcessDBRead.model_validate(create_obj)
             process = read_obj.return_data_obj()
 
-            process.project = await ph.find_project(process.project_uid)
-            if process.tag_uids:
-                process.tags = await th.filter_tags(TagFilter(uid=process.tag_uids))
-            process.consume_resources = await rh.filter_resources(
-                ResourceFilter(resource_uid=process.consume_resource_uids))
-            process.produce_resources = await rh.filter_resources(
-                ResourceFilter(resource_uid=process.produce_resource_uids))
-            if process.machine_used_uid:
-                process.machine_used = await rh.find_resource(resource_uid=process.machine_used_uid)
+            if detailed_output:
+                process.project = await ph.find_project(process.project_uid)
+                if process.tag_uids:
+                    process.tags = await th.filter_tags(TagFilter(uid=process.tag_uids), detailed_output=detailed_output)
+                process.consume_resources = await rh.filter_resources(
+                    ResourceFilter(uid=list(process.consume_resource_uids.keys())), detailed_output=detailed_output)
+                process.produce_resources = await rh.filter_resources(
+                    ResourceFilter(uid=list(process.produce_resource_uids.keys())), detailed_output=detailed_output)
+                if process.machine_used_uid:
+                    process.machine_used = await rh.find_resource(resource_uid=process.machine_used_uid)
 
         self.context.logger.info(f"Created process: [{process.uid}]")
         return process
 
-    async def filter_processes(self, process_filter: ProcessFilter) -> list[Process]:
+    async def filter_processes(self, process_filter: ProcessFilter, detailed_output: bool = False) -> list[Process]:
         self.context.logger.debug(f"Filtering processes")
 
         ph = ProjectHandler()
@@ -65,21 +66,22 @@ class ProcessHandler(BaseHandler):
                 read_obj = ProcessDBRead.model_validate(row)
                 data_obj = read_obj.return_data_obj()
 
-                data_obj.project = await ph.find_project(data_obj.project_uid)
-                if data_obj.tag_uids:
-                    data_obj.tags = await th.filter_tags(TagFilter(uid=data_obj.tag_uids))
-                data_obj.consume_resources = await rh.filter_resources(
-                    ResourceFilter(resource_uid=data_obj.consume_resource_uids))
-                data_obj.produce_resources = await rh.filter_resources(
-                    ResourceFilter(resource_uid=data_obj.produce_resource_uids))
-                if data_obj.machine_used_uid:
-                    data_obj.machine_used = await rh.find_resource(resource_uid=data_obj.machine_used_uid)
+                if detailed_output:
+                    data_obj.project = await ph.find_project(data_obj.project_uid)
+                    if data_obj.tag_uids:
+                        data_obj.tags = await th.filter_tags(TagFilter(uid=data_obj.tag_uids), detailed_output=detailed_output)
+                    data_obj.consume_resources = await rh.filter_resources(
+                        ResourceFilter(uid=list(data_obj.consume_resource_uids.keys())), detailed_output=detailed_output)
+                    data_obj.produce_resources = await rh.filter_resources(
+                        ResourceFilter(uid=list(data_obj.produce_resource_uids.keys())), detailed_output=detailed_output)
+                    if data_obj.machine_used_uid:
+                        data_obj.machine_used = await rh.find_resource(resource_uid=data_obj.machine_used_uid)
 
                 processes.append(data_obj)
         self.context.logger.debug(f"Filter processes found [{len(processes)}]")
         return processes
 
-    async def find_process(self, process_uid: str) -> Process:
+    async def find_process(self, process_uid: str, detailed_output: bool = False) -> Process:
         self.context.logger.debug(f"Find process: [{process_uid}]")
 
         ph = ProjectHandler()
@@ -95,20 +97,21 @@ class ProcessHandler(BaseHandler):
             read_obj = ProcessDBRead.model_validate(row)
             process = read_obj.return_data_obj()
 
-            process.project = await ph.find_project(process.project_uid)
-            if process.tag_uids:
-                process.tags = await th.filter_tags(TagFilter(uid=process.tag_uids))
-            process.consume_resources = await rh.filter_resources(
-                ResourceFilter(resource_uid=process.consume_resource_uids))
-            process.produce_resources = await rh.filter_resources(
-                ResourceFilter(resource_uid=process.produce_resource_uids))
-            if process.machine_used_uid:
-                process.machine_used = await rh.find_resource(resource_uid=process.machine_used_uid)
+            if detailed_output:
+                process.project = await ph.find_project(process.project_uid)
+                if process.tag_uids:
+                    process.tags = await th.filter_tags(TagFilter(uid=process.tag_uids), detailed_output=detailed_output)
+                process.consume_resources = await rh.filter_resources(
+                    ResourceFilter(uid=list(process.consume_resource_uids.keys())), detailed_output=detailed_output)
+                process.produce_resources = await rh.filter_resources(
+                    ResourceFilter(uid=list(process.produce_resource_uids.keys())), detailed_output=detailed_output)
+                if process.machine_used_uid:
+                    process.machine_used = await rh.find_resource(resource_uid=process.machine_used_uid)
 
         self.context.logger.debug(f"Created process: [{process.uid}]")
         return process
 
-    async def update_process(self, process_uid: str, process: Process) -> Process:
+    async def update_process(self, process_uid: str, process: Process, detailed_output: bool = False) -> Process:
         self.context.logger.debug(f"Updating process: [{process_uid}]")
 
         # Validate allowed update Process
@@ -162,15 +165,16 @@ class ProcessHandler(BaseHandler):
             read_obj = ProcessDBRead.model_validate(row)
             process = read_obj.return_data_obj()
 
-            process.project = await ph.find_project(process.project_uid)
-            if process.tag_uids:
-                process.tags = await th.filter_tags(TagFilter(uid=process.tag_uids))
-            process.consume_resources = await rh.filter_resources(
-                ResourceFilter(resource_uid=process.consume_resource_uids))
-            process.produce_resources = await rh.filter_resources(
-                ResourceFilter(resource_uid=process.produce_resource_uids))
-            if process.machine_used_uid:
-                process.machine_used = await rh.find_resource(resource_uid=process.machine_used_uid)
+            if detailed_output:
+                process.project = await ph.find_project(process.project_uid)
+                if process.tag_uids:
+                    process.tags = await th.filter_tags(TagFilter(uid=process.tag_uids), detailed_output=detailed_output)
+                process.consume_resources = await rh.filter_resources(
+                    ResourceFilter(uid=list(process.consume_resource_uids.keys())), detailed_output=detailed_output)
+                process.produce_resources = await rh.filter_resources(
+                    ResourceFilter(uid=list(process.produce_resource_uids.keys())), detailed_output=detailed_output)
+                if process.machine_used_uid:
+                    process.machine_used = await rh.find_resource(resource_uid=process.machine_used_uid)
 
         self.context.logger.info(f"Updated process: [{process.uid}]")
         return process
@@ -182,7 +186,7 @@ class ProcessHandler(BaseHandler):
         process.active = active_state
         process.cascade_active = active_state
 
-        await self.update_process(process_uid=process_uid, process=process)
+        process = await self.update_process(process_uid=process_uid, process=process)
 
         self.context.logger.info(f"Set process activation: [{process.uid}]")
         return process
@@ -194,7 +198,7 @@ class ProcessHandler(BaseHandler):
         process.deleted = True
         process.cascade_deleted = True
 
-        await self.update_process(process_uid=process_uid, process=process)
+        process = await self.update_process(process_uid=process_uid, process=process)
 
         self.context.logger.info(f"Process deleted: [{process.uid}]")
         return process

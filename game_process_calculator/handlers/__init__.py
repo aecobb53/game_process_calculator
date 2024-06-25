@@ -6,6 +6,8 @@ from .process_handler import ProcessHandler
 from .workflow_handler import WorkflowHandler
 from .database_handler import DatabaseHandler
 
+from .calculation_handler import CalculationHandler
+
 # from .base_database_interactor import BaseDatabaseInteractor
 # from .base_handler import BaseHandler
 # from .process_handler import ProcessHandler

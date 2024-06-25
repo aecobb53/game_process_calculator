@@ -19,7 +19,7 @@ class WorkflowHandler(BaseHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    async def create_workflow(self, workflow: Workflow) -> Workflow:
+    async def create_workflow(self, workflow: Workflow, detailed_output: bool = False) -> Workflow:
         self.context.logger.debug(f"Creating workflow: [{workflow.uid}] for project: [{workflow.project_uid}]")
 
         # Validate allowed create Workflow
@@ -38,18 +38,19 @@ class WorkflowHandler(BaseHandler):
             read_obj = WorkflowDBRead.model_validate(create_obj)
             workflow = read_obj.return_data_obj()
 
-            workflow.project = await ph.find_project(workflow.project_uid)
-            if workflow.tag_uids:
-                workflow.tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids))
-            if workflow.focus_resource_uid:
-                workflow.focus_resource = await rh.find_resource(workflow.focus_resource_uid)
-            if workflow.process_uids:
-                workflow.processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids))
+            if detailed_output:
+                workflow.project = await ph.find_project(workflow.project_uid, detailed_output=detailed_output)
+                if workflow.tag_uids:
+                    workflow.tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids), detailed_output=detailed_output)
+                if workflow.focus_resource_uid:
+                    workflow.focus_resource = await rh.find_resource(workflow.focus_resource_uid, detailed_output=detailed_output)
+                if workflow.process_uids:
+                    workflow.processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids), detailed_output=detailed_output)
 
         self.context.logger.info(f"Created workflow: [{workflow.uid}]")
         return workflow
 
-    async def filter_workflows(self, workflow_filter: WorkflowFilter) -> list[Workflow]:
+    async def filter_workflows(self, workflow_filter: WorkflowFilter, detailed_output: bool = False) -> list[Workflow]:
         self.context.logger.debug(f"Filtering workflows")
 
         ph = ProjectHandler()
@@ -66,19 +67,20 @@ class WorkflowHandler(BaseHandler):
                 read_obj = WorkflowDBRead.model_validate(row)
                 workflow = read_obj.return_data_obj()
 
-                workflow.project = await ph.find_project(workflow.project_uid)
-                if workflow.tag_uids:
-                    workflow.tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids))
-                if workflow.focus_resource_uid:
-                    workflow.focus_resource = await rh.find_resource(workflow.focus_resource_uid)
-                if workflow.process_uids:
-                    workflow.processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids))
+                if detailed_output:
+                    workflow.project = await ph.find_project(workflow.project_uid, detailed_output=detailed_output)
+                    if workflow.tag_uids:
+                        workflow.tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids), detailed_output=detailed_output)
+                    if workflow.focus_resource_uid:
+                        workflow.focus_resource = await rh.find_resource(workflow.focus_resource_uid, detailed_output=detailed_output)
+                    if workflow.process_uids:
+                        workflow.processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids), detailed_output=detailed_output)
 
                 workflows.append(workflow)
         self.context.logger.debug(f"Filter workflows found [{len(workflows)}]")
         return workflows
 
-    async def find_workflow(self, workflow_uid: str) -> Workflow:
+    async def find_workflow(self, workflow_uid: str, detailed_output: bool = False) -> Workflow:
         self.context.logger.debug(f"Find workflow: [{workflow_uid}]")
 
         ph = ProjectHandler()
@@ -95,18 +97,19 @@ class WorkflowHandler(BaseHandler):
             read_obj = WorkflowDBRead.model_validate(row)
             workflow = read_obj.return_data_obj()
 
-            workflow.project = await ph.find_project(workflow.project_uid)
-            if workflow.tag_uids:
-                workflow.tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids))
-            if workflow.focus_resource_uid:
-                workflow.focus_resource = await rh.find_resource(workflow.focus_resource_uid)
-            if workflow.process_uids:
-                workflow.processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids))
+            if detailed_output:
+                workflow.project = await ph.find_project(workflow.project_uid, detailed_output=detailed_output)
+                if workflow.tag_uids:
+                    workflow.tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids), detailed_output=detailed_output)
+                if workflow.focus_resource_uid:
+                    workflow.focus_resource = await rh.find_resource(workflow.focus_resource_uid, detailed_output=detailed_output)
+                if workflow.process_uids:
+                    workflow.processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids), detailed_output=detailed_output)
 
         self.context.logger.debug(f"Created workflow: [{workflow.uid}]")
         return workflow
 
-    async def update_workflow(self, workflow_uid: str, workflow: Workflow) -> Workflow:
+    async def update_workflow(self, workflow_uid: str, workflow: Workflow, detailed_output: bool = False) -> Workflow:
         self.context.logger.debug(f"Updating workflow: [{workflow_uid}]")
 
         # Validate allowed update Workflow
@@ -164,13 +167,14 @@ class WorkflowHandler(BaseHandler):
             read_obj = WorkflowDBRead.model_validate(row)
             workflow = read_obj.return_data_obj()
 
-            workflow.project = await ph.find_project(workflow.project_uid)
-            if workflow.tag_uids:
-                workflow.tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids))
-            if workflow.focus_resource_uid:
-                workflow.focus_resource = await rh.find_resource(workflow.focus_resource_uid)
-            if workflow.process_uids:
-                workflow.processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids))
+            if detailed_output:
+                workflow.project = await ph.find_project(workflow.project_uid, detailed_output=detailed_output)
+                if workflow.tag_uids:
+                    workflow.tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids), detailed_output=detailed_output)
+                if workflow.focus_resource_uid:
+                    workflow.focus_resource = await rh.find_resource(workflow.focus_resource_uid, detailed_output=detailed_output)
+                if workflow.process_uids:
+                    workflow.processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids), detailed_output=detailed_output)
 
         self.context.logger.info(f"Updated workflow: [{workflow.uid}]")
         return workflow
@@ -178,11 +182,11 @@ class WorkflowHandler(BaseHandler):
     async def set_activation(self, workflow_uid: str, active_state: bool) -> Workflow:
         self.context.logger.debug(f"Setting workflow activation: [{workflow_uid}] to [{active_state}]")
 
-        workflow = await self.find_workflow(workflow_uid=workflow_uid)
+        workflow = await self.find_workflow(workflow_uid=workflow_uid, detailed_output=detailed_output)
         workflow.active = active_state
         workflow.cascade_active = active_state
 
-        await self.update_workflow(workflow_uid=workflow_uid, workflow=workflow)
+        workflow = await self.update_workflow(workflow_uid=workflow_uid, workflow=workflow)
 
         self.context.logger.info(f"Set workflow activation: [{workflow.uid}]")
         return workflow
@@ -190,11 +194,11 @@ class WorkflowHandler(BaseHandler):
     async def delete_workflow(self, workflow_uid: str) -> Workflow:
         self.context.logger.debug(f"Deleting Workflow: [{workflow_uid}]")
 
-        workflow = await self.find_workflow(workflow_uid=workflow_uid)
+        workflow = await self.find_workflow(workflow_uid=workflow_uid, detailed_output=detailed_output)
         workflow.deleted = True
         workflow.cascade_deleted = True
 
-        await self.update_workflow(workflow_uid=workflow_uid, workflow=workflow)
+        workflow = await self.update_workflow(workflow_uid=workflow_uid, workflow=workflow)
 
         self.context.logger.info(f"Workflow deleted: [{workflow.uid}]")
         return workflow
@@ -203,25 +207,25 @@ class WorkflowHandler(BaseHandler):
     async def validate_can_create_workflow(self, workflow: Workflow) -> None:
         # Validate Project
         ph = ProjectHandler()
-        project = await ph.find_project(project_uid=workflow.project_uid)
+        project = await ph.find_project(project_uid=workflow.project_uid, detailed_output=detailed_output)
         if workflow.project_uid != project.uid:
             raise DataIntegrityException("Workflow project_uid does not match project_uid")
         # Validate Tags
         th = TagHandler()
         if workflow.tag_uids:
-            tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids))
+            tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids), detailed_output=detailed_output)
             if any([t for t in workflow.tag_uids if t not in [tag.uid for tag in tags]]):
                 raise DataIntegrityException("Workflow tag_uids contain invalid tag_uids")
         # Validate Resources
         rh = ResourceHandler()
         if workflow.focus_resource_uid:
-            resource = await rh.find_resource(resource_uid=workflow.focus_resource_uid)
+            resource = await rh.find_resource(resource_uid=workflow.focus_resource_uid, detailed_output=detailed_output)
             if workflow.focus_resource_uid != resource.uid:
                 raise DataIntegrityException("Workflow focus_resource_uid does not match resource_uid")
         # Validate Process
         prh = ProcessHandler()
         if workflow.process_uids:
-            processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids))
+            processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids), detailed_output=detailed_output)
             if any([p for p in workflow.process_uids if p not in [process.uid for process in processes]]):
                 raise DataIntegrityException("Workflow process_uids contain invalid process_uids")
         workflow.project = project
@@ -243,25 +247,25 @@ class WorkflowHandler(BaseHandler):
     async def validate_can_update_workflow(self, workflow_uid: str, workflow: Workflow) -> None:
         # Validate Project
         ph = ProjectHandler()
-        project = await ph.find_project(project_uid=workflow.project_uid)
+        project = await ph.find_project(project_uid=workflow.project_uid, detailed_output=detailed_output)
         if workflow.project_uid != project.uid:
             raise DataIntegrityException("Workflow project_uid does not match project_uid")
         # Validate Tags
         th = TagHandler()
         if workflow.tag_uids:
-            tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids))
+            tags = await th.filter_tags(TagFilter(uid=workflow.tag_uids), detailed_output=detailed_output)
             if any([t for t in workflow.tag_uids if t not in [tag.uid for tag in tags]]):
                 raise DataIntegrityException("Workflow tag_uids contain invalid tag_uids")
         # Validate Resources
         rh = ResourceHandler()
         if workflow.focus_resource_uid:
-            resource = await rh.find_resource(resource_uid=workflow.focus_resource_uid)
+            resource = await rh.find_resource(resource_uid=workflow.focus_resource_uid, detailed_output=detailed_output)
             if workflow.focus_resource_uid != resource.uid:
                 raise DataIntegrityException("Workflow focus_resource_uid does not match resource_uid")
         # Validate Process
         prh = ProcessHandler()
         if workflow.process_uids:
-            processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids))
+            processes = await prh.filter_processes(ProcessFilter(uid=workflow.process_uids), detailed_output=detailed_output)
             if any([p for p in workflow.process_uids if p not in [process.uid for process in processes]]):
                 raise DataIntegrityException("Workflow process_uids contain invalid process_uids")
         workflow.project = project

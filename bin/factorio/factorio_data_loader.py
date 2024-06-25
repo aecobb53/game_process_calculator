@@ -259,7 +259,9 @@ for index, item in enumerate(item_objects):
         elif len(resp.json()['resources']) == 1:
             if upload_data:
                 resource = resp.json()['resources'][0]
-                resp = rdl.put_resource(resource_uid=resource['uid'], json=payload)
+                for key, value in payload.items():
+                    resource[key] = value
+                resp = rdl.put_resource(resource_uid=resource['uid'], json=resource)
                 item.resource_uid = resp.json()['uid']
         else:
             raise Exception(f"Multiple resources found for {item.name}")
@@ -275,7 +277,7 @@ for index, item in enumerate(item_objects):
 print('DONE UPLOADING ITEMS')
 
 any_rest_calls = True
-resources_in_project = rdl.get_resource(params={'project_uid': project_uid}).json()['resources']
+resources_in_project = rdl.get_resource(params={'project_uid': project_uid, 'limit': 100_000}).json()['resources']
 print(f"UPLOADING RESOURCES: [{len(resource_objects)}]")
 logging_interval = len(resource_objects) // 10 + 1
 for index, item in enumerate(resource_objects):
@@ -307,6 +309,8 @@ for index, item in enumerate(resource_objects):
         elif len (resp.json()['processes']) == 1:
             if upload_data:
                 process = resp.json()['processes'][0]
+                for key, value in payload.items():
+                    process[key] = value
                 resp = rdl.put_process(process_uid=process['uid'], json=payload)
                 item.process_uid = resp.json()['uid']
         else:
@@ -324,7 +328,7 @@ for index, item in enumerate(resource_objects):
 print('DONE UPLOADING RESOURCES')
 
 any_rest_calls = True
-resources_in_project = rdl.get_resource(params={'project_uid': project_uid}).json()['resources']
+resources_in_project = rdl.get_resource(params={'project_uid': project_uid, 'limit': 100_000}).json()['resources']
 print(f"UPLOADING RECIPES: [{len(recipe_objects)}]")
 logging_interval = len(recipe_objects) // 10 + 1
 for index, item in enumerate(recipe_objects):

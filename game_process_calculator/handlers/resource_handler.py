@@ -17,7 +17,7 @@ class ResourceHandler(BaseHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    async def create_resource(self, resource: Resource) -> Resource:
+    async def create_resource(self, resource: Resource, detailed_output: bool = False) -> Resource:
         self.context.logger.debug(f"Creating resource: [{resource.uid}] for project: [{resource.project_uid}]")
 
         # Validate allowed create Resource
@@ -34,14 +34,15 @@ class ResourceHandler(BaseHandler):
             read_obj = ResourceDBRead.model_validate(create_obj)
             resource = read_obj.return_data_obj()
 
-            resource.project = await ph.find_project(resource.project_uid)
-            if resource.tag_uids:
-                resource.tags = await th.filter_tags(TagFilter(uid=resource.tag_uids))
+            if detailed_output:
+                resource.project = await ph.find_project(resource.project_uid)
+                if resource.tag_uids:
+                    resource.tags = await th.filter_tags(TagFilter(uid=resource.tag_uids), detailed_output=detailed_output)
 
         self.context.logger.info(f"Created resource: [{resource.uid}]")
         return resource
 
-    async def filter_resources(self, resource_filter: ResourceFilter) -> list[Resource]:
+    async def filter_resources(self, resource_filter: ResourceFilter, detailed_output: bool = False) -> list[Resource]:
         self.context.logger.debug(f"Filtering resources")
 
         ph = ProjectHandler()
@@ -56,15 +57,16 @@ class ResourceHandler(BaseHandler):
                 read_obj = ResourceDBRead.model_validate(row)
                 resource = read_obj.return_data_obj()
 
-                resource.project = await ph.find_project(resource.project_uid)
-                if resource.tag_uids:
-                    resource.tags = await th.filter_tags(TagFilter(uid=resource.tag_uids))
+                if detailed_output:
+                    resource.project = await ph.find_project(resource.project_uid)
+                    if resource.tag_uids:
+                        resource.tags = await th.filter_tags(TagFilter(uid=resource.tag_uids), detailed_output=detailed_output)
 
                 resources.append(resource)
         self.context.logger.debug(f"Filter resources found [{len(resources)}]")
         return resources
 
-    async def find_resource(self, resource_uid: str) -> Resource:
+    async def find_resource(self, resource_uid: str, detailed_output: bool = False) -> Resource:
         self.context.logger.debug(f"Find resource: [{resource_uid}]")
 
         ph = ProjectHandler()
@@ -79,14 +81,15 @@ class ResourceHandler(BaseHandler):
             read_obj = ResourceDBRead.model_validate(row)
             resource = read_obj.return_data_obj()
 
-            resource.project = await ph.find_project(resource.project_uid)
-            if resource.tag_uids:
-                resource.tags = await th.filter_tags(TagFilter(uid=resource.tag_uids))
+            if detailed_output:
+                resource.project = await ph.find_project(resource.project_uid)
+                if resource.tag_uids:
+                    resource.tags = await th.filter_tags(TagFilter(uid=resource.tag_uids), detailed_output=detailed_output)
 
         self.context.logger.debug(f"Created resource: [{resource.uid}]")
         return resource
 
-    async def update_resource(self, resource_uid: str, resource: Resource) -> Resource:
+    async def update_resource(self, resource_uid: str, resource: Resource, detailed_output: bool = False) -> Resource:
         self.context.logger.debug(f"Updating resource: [{resource_uid}]")
 
         # Validate allowed update Resource
@@ -139,9 +142,10 @@ class ResourceHandler(BaseHandler):
             read_obj = ResourceDBRead.model_validate(row)
             resource = read_obj.return_data_obj()
 
-            resource.project = await ph.find_project(resource.project_uid)
-            if resource.tag_uids:
-                resource.tags = await th.filter_tags(TagFilter(uid=resource.tag_uids))
+            if detailed_output:
+                resource.project = await ph.find_project(resource.project_uid)
+                if resource.tag_uids:
+                    resource.tags = await th.filter_tags(TagFilter(uid=resource.tag_uids), detailed_output=detailed_output)
 
         self.context.logger.info(f"Updated resource: [{resource.uid}]")
         return resource
@@ -153,7 +157,7 @@ class ResourceHandler(BaseHandler):
         resource.active = active_state
         resource.cascade_active = active_state
 
-        await self.update_resource(resource_uid=resource_uid, resource=resource)
+        resource = await self.update_resource(resource_uid=resource_uid, resource=resource)
 
         self.context.logger.info(f"Set resource activation: [{resource.uid}]")
         return resource
@@ -165,7 +169,7 @@ class ResourceHandler(BaseHandler):
         resource.deleted = True
         resource.cascade_deleted = True
 
-        await self.update_resource(resource_uid=resource_uid, resource=resource)
+        resource = await self.update_resource(resource_uid=resource_uid, resource=resource)
 
         self.context.logger.info(f"Resource deleted: [{resource.uid}]")
         return resource
@@ -180,7 +184,7 @@ class ResourceHandler(BaseHandler):
         # Validate Tags
         th = TagHandler()
         if resource.tag_uids:
-            tags = await th.filter_tags(TagFilter(uid=resource.tag_uids))
+            tags = await th.filter_tags(TagFilter(uid=resource.tag_uids), detailed_output=detailed_output)
             if len(tags) != len(resource.tag_uids):
                 raise DataIntegrityException("Resource tag_uids do not match tags")
         resource.project = project
@@ -208,7 +212,7 @@ class ResourceHandler(BaseHandler):
         # Validate Tags
         th = TagHandler()
         if resource.tag_uids:
-            tags = await th.filter_tags(TagFilter(uid=resource.tag_uids))
+            tags = await th.filter_tags(TagFilter(uid=resource.tag_uids), detailed_output=detailed_output)
             if len(tags) != len(resource.tag_uids):
                 raise DataIntegrityException("Resource tag_uids do not match tags")
         resource.project = project

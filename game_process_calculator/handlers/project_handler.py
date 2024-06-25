@@ -23,7 +23,7 @@ class ProjectHandler(BaseHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    async def create_project(self, project: Project) -> Project:
+    async def create_project(self, project: Project, detailed_output: bool = False) -> Project:
         self.context.logger.debug(f"Creating project: [{project.uid}]")
 
         # Validate allowed create Project
@@ -40,7 +40,7 @@ class ProjectHandler(BaseHandler):
         self.context.logger.info(f"Created project: [{project.uid}]")
         return project
 
-    async def filter_projects(self, project_filter: ProjectFilter) -> list[Project]:
+    async def filter_projects(self, project_filter: ProjectFilter, detailed_output: bool = False) -> list[Project]:
         self.context.logger.debug(f"Filtering projects")
         with Session(self.context.database.engine) as session:
             query = select(ProjectDB)
@@ -54,7 +54,7 @@ class ProjectHandler(BaseHandler):
         self.context.logger.debug(f"Filter projects found [{len(projects)}]")
         return projects
 
-    async def find_project(self, project_uid: str) -> Project:
+    async def find_project(self, project_uid: str, detailed_output: bool = False) -> Project:
         self.context.logger.debug(f"Find project: [{project_uid}]")
         with Session(self.context.database.engine) as session:
             query = select(ProjectDB)
@@ -67,7 +67,7 @@ class ProjectHandler(BaseHandler):
         self.context.logger.debug(f"Project found: [{project.uid}]")
         return project
 
-    async def update_project(self, project_uid: str, project: Project) -> Project:
+    async def update_project(self, project_uid: str, project: Project, detailed_output: bool = False) -> Project:
         self.context.logger.debug(f"Updating project: [{project_uid}]")
 
         # Validate allowed update Project
@@ -169,7 +169,7 @@ class ProjectHandler(BaseHandler):
                 session.add(row)
             session.commit()
 
-        await self.update_project(project_uid=project_uid, project=project)
+        project = await self.update_project(project_uid=project_uid, project=project)
 
         self.context.logger.info(f"Set project activation: [{project.uid}]")
         return project
@@ -225,7 +225,7 @@ class ProjectHandler(BaseHandler):
                 session.add(row)
             session.commit()
 
-        await self.update_project(project_uid=project_uid, project=project)
+        project = await self.update_project(project_uid=project_uid, project=project)
 
         self.context.logger.info(f"Project deleted: [{project.uid}]")
         return project

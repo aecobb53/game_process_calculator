@@ -36,5 +36,5 @@ from .workflow import(ProcessType,
     WorkflowDBRead,
     WorkflowDB,
     WorkflowFilter)
-# from .balancing_args import BalanceWorkflowArgs
+from .balancing_args import BalanceWorkflowArgs
 from .request_models import RestHeaders, ResponseTypes

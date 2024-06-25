@@ -40,6 +40,9 @@ class Workflow(GPCBaseModel):
     focus_resource: Resource | None = None
     focus_resource_uid: str | None = None
 
+    parallel_processes_counter: Dict[str, int] | None = None
+    resource_throughputs_per_second: Dict[str, float] | None = None
+
     @model_validator(mode='before')
     def validate_fields(cls, fields):
         fields = super().validate_fields(fields)
@@ -51,6 +54,10 @@ class Workflow(GPCBaseModel):
             raise ValueError("A project or project_uid must be provided to create a resource")
         return fields
 
+    # @model_validator(mode='after')
+    # def validate_fields(cls, fields):
+    #     fields.parallel_processes_counter = [{i: 1} for i in fields.process_uids]
+    #     return fields
 
 class WorkflowDBBase(SQLModel):
     id: int | None = Field(primary_key=True, default=None)

@@ -4,13 +4,13 @@ import json
 from fastapi import FastAPI, Query, Request, HTTPException, Body
 from fastapi.responses import HTMLResponse, ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Annotated
 
 from models import RestHeaders, ResponseTypes
-from handlers import DatabaseHandler
+from models import WorkflowFilter, BalanceWorkflowArgs
+from handlers import DatabaseHandler, CalculationHandler
 from app_files import ContextSingleton, init_logger
 from html import (project_base_page)
-
+from utils import parse_query_params
 
 from my_base_html_lib import MyBaseDocument, NavigationContent, SidebarContent, BodyContent, FooterContent
 from phtml import Header, Style
@@ -102,3 +102,13 @@ async def service_info(request: Request):
         return HTMLResponse(content=new_formated_doc.return_document, status_code=200)
     elif header_details.response_type == ResponseTypes.JSON:
         return service_info
+
+@app.get('/TESTING', status_code=200)
+async def root(request: Request):
+    ch = CalculationHandler()
+    workflow_filter = parse_query_params(request=request, query_class=WorkflowFilter)
+    print(workflow_filter)
+    balance_criteria = parse_query_params(request=request, query_class=BalanceWorkflowArgs)
+    print(balance_criteria)
+    workflows = await ch.calculate_workflow(workflow_filter=workflow_filter, balance_criteria=balance_criteria)
+    return {'workflows': workflows}
